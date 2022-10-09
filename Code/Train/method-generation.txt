@@ -1,0 +1,4 @@
+class Beam(object):
+    def __init__(self, size, sos, eos):
+        self.size = size
+        self.tt = torch.cuda
