@@ -21,7 +21,12 @@
 - [ ] Create new views, probability distribution
 - [ ] Allow for some interactive aspect with the charts
 
-## Current UML
+## Current Diagrams
+### Components UML
+![Components](Artifacts/component.png)
+
+### Sequence Diagram
+![Sequence Diagram](Artifacts/sequence.png)
 
 ## Installation
 First prototype of our tool is still in progress.
