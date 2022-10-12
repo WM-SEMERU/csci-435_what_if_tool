@@ -6,7 +6,7 @@
 
 ## Development
 - Pip tool: user can install this tool from pip/conda and utilize with their NLP model
-- Python Backend: user designates dataset and model as parameters for our tool. Our tool then runs the model and produces some vector dataset in its object. We will probably use GPT2 as our predictive model. 
+- Python Backend: user designates dataset and model as parameters for our tool. Our tool then runs the model and produces some vector dataset in its object.
 - Ideas for Frontend
   - Dashboard: Several visuals at the same time. This would allow the user to interact with each of the visuals provided
   - One at a time: User designates which view they want to see from their view at any given point
