@@ -2,11 +2,11 @@
 ## Main Idea
 [Google WIT](https://github.com/PAIR-code/what-if-tool) was the main inspiration for this project. Our goal is to create a similar tool purely for focusing on ML models revolving around software engineering design and principles, such as code completion and code generation. 
 
-[BertViz](https://github.com/jessevig/bertviz) is a good first example for where our tool will go. We hope to support a full dashboard of several views that researchers would find helpful in order to analyze their models. This would probably include newly generated word count charts, probability distributions for new tokens, attention views.
+[BertViz](https://github.com/jessevig/bertviz) is a good first example for where our tool will go. We hope to support a full dashboard of several views that researchers would find helpful in order to analyze their models. This would probably include newly generated word count charts, probability distributions for new tokens, and attention views.
 
 ## Development
 - Pip tool: user can install this tool from pip/conda and utilize with their NLP model
-- Python Backend: user designates dataset and model as parameters for our tool. Our tool then runs the model and produces some vector dataset in its object. 
+- Python Backend: user designates dataset and model as parameters for our tool. Our tool then runs the model and produces some vector dataset in its object. We will probably use GPT2 as our predictive model. 
 - Ideas for Frontend
   - Dashboard: Several visuals at the same time. This would allow the user to interact with each of the visuals provided
   - One at a time: User designates which view they want to see from their view at any given point
