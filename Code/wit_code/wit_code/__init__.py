@@ -9,8 +9,8 @@ __author__ = 'Daniel Rodriguez Cardenas'
 __credits__ = 'College of William & Mary'
 
 
-from .run_model import run_pipeline
+from .display import run_server
 
 
-def WITCode(model, dataset, tokenizer):
-    run_pipeline(model, dataset, tokenizer)
+def WITCode(model: str = "gpt2", dataset: str = "", tokenizer: str = "gpt2") -> None:
+    run_server(model, dataset, tokenizer)

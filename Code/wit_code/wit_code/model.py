@@ -1,10 +1,7 @@
-# from unittest.util import _MAX_LENGTH
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-from .display import display_bar_chart
 
-
-def run_pipeline(model, dataset, tokenizer):
+def run_pipeline(model: str, dataset: str, tokenizer: str) -> None:
     print("Pipeline initiated")
     selected_model = AutoModelForCausalLM.from_pretrained(model)
     selected_tokenizer = AutoTokenizer.from_pretrained(tokenizer)
@@ -15,9 +12,8 @@ def run_pipeline(model, dataset, tokenizer):
     outputs = selected_model.generate(
         input_ids, do_sample=False, max_length=50)
 
-    answer = selected_tokenizer.batch_decode(outputs, skip_speical_tokens=True)
+    output_strs = selected_tokenizer.batch_decode(
+        outputs, skip_special_tokens=True)
+    output_tkns = selected_tokenizer.tokenize(output_strs[0])
 
-    answer_tokens = selected_tokenizer.tokenize(answer[0])
-
-    # print(answer_tokens)
-    display_bar_chart(answer_tokens)
+    return output_tkns
