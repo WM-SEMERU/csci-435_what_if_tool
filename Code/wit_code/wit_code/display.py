@@ -22,7 +22,8 @@ def display_bar_chart(dataset):
         ]
     )
 
-    @app.callback(Output("graph", "figure"), Input("dropdown", "value"))
+    # TODO: user interactivity with listener functions
+    @app.callback(Input("dropdown", "value"), Output("graph", "figure"))
     def update_bar_chart(day):
         df = preprocess(dataset)
         fig = px.bar(df, x="frequency", y="token")
