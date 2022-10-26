@@ -34,7 +34,9 @@ First prototype of our tool is still in progress.
 ### Build and Run Docker Image
 Start docker
 
-Navigate to project folder and run ```docker build .``` to build image
+Navigate to project folder and run ```docker-compose up -d --build``` to build image
 
-Run ```docker run csci435whatiftool``` to run image
+Navigate to ```localhost:8888``` to run jupyter notebook. password is ```wit```
+
+To stop docker container run ```docker-compose down```
 
