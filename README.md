@@ -30,3 +30,11 @@
 
 ## Installation
 First prototype of our tool is still in progress.
+
+### Build and Run Docker Image
+Start docker
+
+Navigate to project folder and run ```docker build .``` to build image
+
+Run ```docker run csci435whatiftool``` to run image
+
