@@ -5,11 +5,11 @@ from setuptools import setup
 
 setup(
     name='wit_code',
-    version='0.1.0',
+    version='0.0.4',
     description='What-if-tool Code. A Visual Tool for Understanding Machine Learning Models for Software Engineering',
     url='https://github.com/WM-SEMERU/csci-435_what_if_tool',
-    author='Daniel Rodriguez Cardenas',
-    author_email='danielrcardenas@gmail.com',
+    author='Ignat Miagkov',
+    author_email='iamiagkov@wm.edu',
     license='BSD 2-clause',
     packages=['wit_code'],
     install_requires=['typing',

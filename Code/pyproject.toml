@@ -8,7 +8,7 @@ authors = [
   { name="Ignat Miagkov", email="iamiagkov@wm.edu" },
 ]
 description = "Code What-If-Tool"
-readme = "README.md"
+readme = "../README.md"
 requires-python = ">=3.7"
 dependencies = [
   'jupyter-dash',
