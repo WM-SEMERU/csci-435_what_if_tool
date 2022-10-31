@@ -29,4 +29,12 @@
 ![Sequence Diagram](Artifacts/sequence.png)
 
 ## Installation
-First prototype of our tool is still in progress.
+First prototype is currently available on PyPi. It does not do much (yet), but you can initialize an interactive bar graph of token counts in your notebook.
+
+```
+!pip install codewit-semeru
+
+from wit_code import wit_code
+wit_code.WITCode("gpt2", "This is a chunk of code", "gpt2")
+```
+These lines can be run directly from your notebook. Python 3.8 is required.
