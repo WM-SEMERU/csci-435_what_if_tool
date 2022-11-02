@@ -9,7 +9,7 @@ __author__ = 'WM-SEMERU'
 __credits__ = 'College of William & Mary'
 
 
-from .display import run_server
+from .frontend.display import run_server
 
 
 def WITCode(model: str = "gpt2", dataset: str = "", tokenizer: str = "gpt2") -> None:

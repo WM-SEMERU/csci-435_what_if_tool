@@ -1,12 +1,11 @@
-from collections import Counter
-from typing import TypedDict, List, Union
-import pandas as pd
+from typing import TypedDict, Union
 from jupyter_dash import JupyterDash
 import plotly.express as px
 from dash import dcc, html, Input, Output
 from bertviz import head_view
 
-from .model import run_pipeline
+from ..backend.model import preprocess
+from .layout import data_editor_components, graph_settings_components
 
 
 class Dataset(TypedDict):
@@ -23,51 +22,31 @@ def run_server(model: str, dataset: Union[str, int], tokenizer: str) -> None:
     app = JupyterDash(__name__)
     # server = app.server
 
-    components = [
+    """ components = [
         dcc.Dropdown(
             id="dataset_dropdown",
             options=DUMMY_DATA,
             value=dataset,
             clearable=False,
         ),
-        dcc.Graph(id="graph"),
-        dcc.RadioItems(id="bertviz_select",
-                options=[{'label': i, 'value': i} for i in ['Head', 'Modeal', 'Neuron']],
-                labelStyle={'display': 'inline-block'}),
-        dcc.Graph(id="bertviz"),
-        ]
+        dcc.Graph(id="graph")] """
 
     app.layout = html.Div([
-        html.Div(components)
+        html.Div(data_editor_components, className="dataEditor"),
+        html.Div(graph_settings_components, className="graphSettings"),
+        html.Div([dcc.Graph(id="graph")], className="graph")
     ])
-        # head_view(dataset, dataset)
+    # head_view(dataset, dataset)
 
-    # TODO: user interactivity with listener functions
     @app.callback(Output("graph", "figure"), Input("dataset_dropdown", "value"))
     def update_bar_chart(selected_dataset: Union[Dataset, str]):
-        print("Testing")
         dataset = selected_dataset if isinstance(
             selected_dataset, str) else selected_dataset.data
         df = preprocess(model, dataset, tokenizer)
+        print(df)
         fig = px.bar(df, x="frequency", y="token")
         return fig
-
-    # @app.callback(Output("bertviz", "figure"), Input("bertviz_select", "value"))
-    # def update_bertviz(selected_view):
-    #     fig = px.bar()
-    #     return fig
 
     update_bar_chart(dataset if dataset else DUMMY_DATA[0])
 
     app.run_server(mode="inline", debug=True)
-
-
-def preprocess(model: str, dataset: str, tokenizer: str) -> List[str]:
-    output_tkns = run_pipeline(model, dataset, tokenizer)
-
-    counts = Counter(output_tkns)
-    token_freq = pd.DataFrame(
-        counts.items(), columns=["token", "frequency"]
-    ).sort_values(by="frequency", ascending=False)
-
-    return token_freq.head(20)
