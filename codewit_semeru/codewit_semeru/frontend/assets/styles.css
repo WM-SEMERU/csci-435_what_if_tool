@@ -29,16 +29,18 @@
     position: fixed;
     background-color:#DDD;
     border-style:solid;
+    z-index: 200;
 }
 .graph{
     width: 100%;
     height: 100%;
     min-height: 160px;
-    margin-top: 82px;
+    margin-top: 120px;
     margin-left: 162px;
     position: fixed;
     background-color: #CCC;
     border-style: solid;
+    z-index: 100;
 }
 select{
     margin-left: 5px;

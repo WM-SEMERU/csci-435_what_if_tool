@@ -34,7 +34,10 @@ def run_server(model: str, dataset: Union[str, int], tokenizer: str) -> None:
     app.layout = html.Div([
         html.Div(data_editor_components, className="dataEditor"),
         html.Div(graph_settings_components, className="graphSettings"),
-        html.Div([dcc.Graph(id="graph")], className="graph")
+        html.Div([dcc.Graph(id="graph")], className="graph"),
+        # Attempt to add radio items to select some bertviz view
+        # html.Div(dcc.RadioItems(["head", "neuron", "model"], id="bert_select")),
+        # html.Div([dcc.Graph(id="bertviz")]), 
     ])
     # head_view(dataset, dataset)
 
