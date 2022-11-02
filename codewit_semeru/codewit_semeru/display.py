@@ -30,7 +30,12 @@ def run_server(model: str, dataset: Union[str, int], tokenizer: str) -> None:
             value=dataset,
             clearable=False,
         ),
-        dcc.Graph(id="graph"),]
+        dcc.Graph(id="graph"),
+        dcc.RadioItems(id="bertviz_select",
+                options=[{'label': i, 'value': i} for i in ['Head', 'Modeal', 'Neuron']],
+                labelStyle={'display': 'inline-block'}),
+        dcc.Graph(id="bertviz"),
+        ]
 
     app.layout = html.Div([
         html.Div(components)
@@ -46,6 +51,11 @@ def run_server(model: str, dataset: Union[str, int], tokenizer: str) -> None:
         df = preprocess(model, dataset, tokenizer)
         fig = px.bar(df, x="frequency", y="token")
         return fig
+
+    # @app.callback(Output("bertviz", "figure"), Input("bertviz_select", "value"))
+    # def update_bertviz(selected_view):
+    #     fig = px.bar()
+    #     return fig
 
     update_bar_chart(dataset if dataset else DUMMY_DATA[0])
 
