@@ -1,3 +1,5 @@
+from pipeline import Pipeline
+
 class PipelineStore(object):
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -7,17 +9,25 @@ class PipelineStore(object):
     def __init__(self) -> None:
         self.pipelines = []
 
-    def addPipeline(self, item):
+    def addPipeline(self, item: Pipeline) -> None:
         self.pipelines.append(item)
+
+    def runPipelines(self) -> None:
+        for pipe in self.pipelines:
+            pipe.start()
+
+    def rerunPipe(self, x: int) -> None:
+        return
 
 a = PipelineStore()
 b = PipelineStore()
 
 print (a is b)
 
-a.addPipeline(4)
-b.addPipeline(37)
+a.addPipeline(Pipeline('gpt2', 'gpt2', 'chunk of code'))
 
 print(a.pipelines)
 print(b.pipelines)
+
+a.runPipelines()
 
