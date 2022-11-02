@@ -5,6 +5,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from .pipeline import Pipeline
 from .pipeline_store import PipelineStore
 
+pipes = PipelineStore()
 
 def run_pipeline(model: str, dataset: str, tokenizer: str) -> None:
     print("Pipeline initiated")
@@ -28,11 +29,13 @@ def run_pipeline(model: str, dataset: str, tokenizer: str) -> None:
 
 
 def preprocess(model: str, dataset: str, tokenizer: str) -> List[str]:
-    curr_pipe = Pipeline(tokenizer, model, dataset)
-    curr_pipe.start()
+    pipes.addPipeline(Pipeline(tokenizer, model, dataset))
+    pipes.runPipelines()
+    # curr_pipe = Pipeline(tokenizer, model, dataset)
+    # curr_pipe.start()
     # output_tkns = run_pipeline(model, dataset, tokenizer)
 
-    output_tkns = curr_pipe.output_tkns
+    output_tkns = pipes.getPipeline(0).output_tkns
 
     counts = Counter(output_tkns)
     token_freq = pd.DataFrame(
@@ -40,3 +43,6 @@ def preprocess(model: str, dataset: str, tokenizer: str) -> List[str]:
     ).sort_values(by="frequency", ascending=False)
 
     return token_freq.head(20)
+
+def get_bertviz():
+    return pipes.getPipeline(0).attention, pipes.getPipeline(0).input_tkns

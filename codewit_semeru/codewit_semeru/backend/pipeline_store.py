@@ -1,4 +1,4 @@
-from pipeline import Pipeline
+from .pipeline import Pipeline
 
 class PipelineStore(object):
     def __new__(cls):
@@ -12,6 +12,9 @@ class PipelineStore(object):
     def addPipeline(self, item: Pipeline) -> None:
         self.pipelines.append(item)
 
+    def getPipeline(self, x: int) -> None:
+        return self.pipelines[x]
+
     def runPipelines(self) -> None:
         for pipe in self.pipelines:
             pipe.start()
@@ -21,15 +24,4 @@ class PipelineStore(object):
             return
         self.pipelines[x].start()
 
-a = PipelineStore()
-b = PipelineStore()
-
-print (a is b)
-
-a.addPipeline(Pipeline('gpt2', 'gpt2', 'chunk of code'))
-
-print(a.pipelines)
-print(b.pipelines)
-
-a.runPipelines()
 

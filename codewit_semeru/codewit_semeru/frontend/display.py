@@ -4,7 +4,8 @@ import plotly.express as px
 from dash import dcc, html, Input, Output
 from bertviz import head_view
 
-from ..backend.model import preprocess
+from ..backend.model import preprocess, get_bertviz
+from ..backend.pipeline_store import PipelineStore
 from .layout import data_editor_components, graph_settings_components
 
 
@@ -20,6 +21,7 @@ DUMMY_DATA = [{"label": 1, "value": "This is some chunk of code that I wish to a
 
 def run_server(model: str, dataset: Union[str, int], tokenizer: str) -> None:
     app = JupyterDash(__name__)
+    pipe_store = PipelineStore()
     # server = app.server
 
     """ components = [
@@ -51,9 +53,10 @@ def run_server(model: str, dataset: Union[str, int], tokenizer: str) -> None:
         return fig
     
     @app.callback(Output("bertviz", "figure"), Input("dataset_dropdown", "value"))
-    def update_bertviz(selected_dataset: Union[Dataset, str]):
-        return
-
+    def update_bertviz():
+        attention, input_tkns = get_bertviz()
+        return head_view(attention, input_tkns)
+    
     update_bar_chart(dataset if dataset else DUMMY_DATA[0])
 
     app.run_server(mode="inline", debug=True)
