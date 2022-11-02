@@ -4,8 +4,8 @@ wit_code
 What-if-tool Code. A Visual Tool for Understanding Machine Learning Models for Software Engineering
 """
 
-__version__ = "0.1.0"
-__author__ = 'Daniel Rodriguez Cardenas'
+__version__ = "0.0.4"
+__author__ = 'WM-SEMERU'
 __credits__ = 'College of William & Mary'
 
 

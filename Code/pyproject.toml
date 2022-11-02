@@ -9,7 +9,7 @@ authors = [
 ]
 description = "Code What-If-Tool"
 readme = "../README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
   'jupyter-dash',
   'transformers',

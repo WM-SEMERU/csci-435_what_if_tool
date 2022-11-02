@@ -4,6 +4,7 @@ import pandas as pd
 from jupyter_dash import JupyterDash
 import plotly.express as px
 from dash import dcc, html, Input, Output
+from bertviz import head_view
 
 from .model import run_pipeline
 
@@ -29,9 +30,12 @@ def run_server(model: str, dataset: Union[str, int], tokenizer: str) -> None:
             value=dataset,
             clearable=False,
         ),
-        dcc.Graph(id="graph")]
+        dcc.Graph(id="graph"),]
 
-    app.layout = html.Div(components)
+    app.layout = html.Div([
+        html.Div(components)
+    ])
+        # head_view(dataset, dataset)
 
     # TODO: user interactivity with listener functions
     @app.callback(Output("graph", "figure"), Input("dataset_dropdown", "value"))
