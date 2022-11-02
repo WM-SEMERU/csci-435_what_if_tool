@@ -6,6 +6,7 @@ name = "codewit_semeru"
 version = "0.0.1"
 authors = [
   { name="Ignat Miagkov", email="iamiagkov@wm.edu" },
+  { name="Duke Tran", email="dtran@wm.edu" }
 ]
 description = "Code What-If-Tool"
 readme = "../README.md"
