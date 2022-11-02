@@ -1,7 +1,0 @@
-pandas
-numpy
-jupyter_dash
-plotly
-dash
-huggingface
-transformers
