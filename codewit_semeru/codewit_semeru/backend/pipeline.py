@@ -14,14 +14,21 @@ class Pipeline:
         self.output_strs = None
         self.output_tkns = None
         self.device = None
+        self.completed = False
 
         self.model.config.pad_token_id = self.model.config.eos_token_id
         self.input_ids = self.tokenizer(dataset, return_tensors="pt").input_ids.to(self.device)
         self.input_tkns = self.tokenizer.convert_ids_to_tokens(self.input_ids[0])
 
     def start(self) -> None:
+        # Weird interaction here were specifiying transformers generate pipeline + getting attention does not quite work...
+        # to-do : figure out how to extract all necessary info from one pipeline run
         self.output = self.model.generate(self.input_ids, do_sample=False, max_length=50)
-        self.attention = self.output[-1]
+        self.test_output = self.model(self.input_ids)
+        self.attention = self.test_output[-1]
         self.output_strs = self.tokenizer.batch_decode(self.output, skip_special_tokens=True)
         self.output_tkns = self.tokenizer.tokenize(self.output_strs[0])
+        self.completed = True
+        # print(self.attention)
+        print(self.input_tkns)
         print("Completed")
