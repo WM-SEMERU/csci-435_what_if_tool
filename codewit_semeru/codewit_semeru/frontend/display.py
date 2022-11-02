@@ -37,7 +37,7 @@ def run_server(model: str, dataset: Union[str, int], tokenizer: str) -> None:
         html.Div([dcc.Graph(id="graph")], className="graph"),
         # Attempt to add radio items to select some bertviz view
         # html.Div(dcc.RadioItems(["head", "neuron", "model"], id="bert_select")),
-        # html.Div([dcc.Graph(id="bertviz")]), 
+        html.Div([dcc.Graph(id="bertviz")], className="bertviz"), 
     ])
     # head_view(dataset, dataset)
 
@@ -49,6 +49,10 @@ def run_server(model: str, dataset: Union[str, int], tokenizer: str) -> None:
         print(df)
         fig = px.bar(df, x="frequency", y="token")
         return fig
+    
+    @app.callback(Output("bertviz", "figure"), Input("dataset_dropdown", "value"))
+    def update_bertviz(selected_dataset: Union[Dataset, str]):
+        return
 
     update_bar_chart(dataset if dataset else DUMMY_DATA[0])
 

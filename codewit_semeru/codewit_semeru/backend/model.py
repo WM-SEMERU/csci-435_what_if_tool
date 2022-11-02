@@ -2,6 +2,8 @@ from typing import List
 from collections import Counter
 import pandas as pd
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from .pipeline import Pipeline
+from .pipeline_store import PipelineStore
 
 
 def run_pipeline(model: str, dataset: str, tokenizer: str) -> None:
@@ -26,7 +28,11 @@ def run_pipeline(model: str, dataset: str, tokenizer: str) -> None:
 
 
 def preprocess(model: str, dataset: str, tokenizer: str) -> List[str]:
-    output_tkns = run_pipeline(model, dataset, tokenizer)
+    curr_pipe = Pipeline(tokenizer, model, dataset)
+    curr_pipe.start()
+    # output_tkns = run_pipeline(model, dataset, tokenizer)
+
+    output_tkns = curr_pipe.output_tkns
 
     counts = Counter(output_tkns)
     token_freq = pd.DataFrame(

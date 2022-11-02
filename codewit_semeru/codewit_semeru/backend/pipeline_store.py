@@ -17,7 +17,9 @@ class PipelineStore(object):
             pipe.start()
 
     def rerunPipe(self, x: int) -> None:
-        return
+        if x >= len(self.pipelines):
+            return
+        self.pipelines[x].start()
 
 a = PipelineStore()
 b = PipelineStore()
