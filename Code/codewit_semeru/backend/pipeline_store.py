@@ -1,5 +1,6 @@
 from .pipeline import Pipeline
 
+
 class PipelineStore(object):
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -9,28 +10,26 @@ class PipelineStore(object):
     def __init__(self) -> None:
         self.pipelines = []
 
-    def addPipeline(self, item: Pipeline) -> None:
+    def add_pipeline(self, item: Pipeline) -> None:
         self.pipelines.insert(0, item)
-    
-    def removePipeline(self, index:int) -> None:
+
+    def remove_pipeline(self, index: int) -> None:
         if not self.size():
             return
         self.pipelines.pop(index)
 
-    def getPipeline(self, x: int) -> None:
+    def get_pipeline(self, x: int) -> None:
         return self.pipelines[x]
 
-    def runPipelines(self) -> None:
+    def run_pipelines(self) -> None:
         for pipe in self.pipelines:
             if not pipe.completed:
-                pipe.start()
+                pipe.run()
 
-    def rerunPipe(self, x: int) -> None:
+    def rerun_pipe(self, x: int) -> None:
         if x >= len(self.pipelines):
             return
-        self.pipelines[x].start()
-    
+        self.pipelines[x].run()
+
     def size(self) -> int:
         return len(self.pipelines)
-
-

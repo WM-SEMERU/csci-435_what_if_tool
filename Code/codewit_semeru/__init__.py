@@ -1,5 +1,5 @@
 """
-wit_code
+codewit_semeru
 
 What-if-tool Code. A Visual Tool for Understanding Machine Learning Models for Software Engineering
 """
@@ -12,5 +12,5 @@ __credits__ = 'College of William & Mary'
 from .frontend.display import run_server
 
 
-def WITCode(model: str = "gpt2", dataset: str = "", tokenizer: str = "gpt2") -> None:
-    run_server(model, dataset, tokenizer)
+def WITCode(tokenizer: str = "gpt2", model: str = "gpt2", dataset: str = "") -> None:
+    run_server(tokenizer, model, dataset)
