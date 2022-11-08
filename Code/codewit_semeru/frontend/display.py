@@ -19,6 +19,8 @@ DUMMY_DATA = [{"label": 1, "value": "This is some chunk of code that I wish to a
               {"label": 2, "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
               {"label": 3, "value": "def foo(bar): print(bar); foo(123)"}]
 
+models = ["gpt2", "gpt_neo", "gpt_neox"]
+
 pipes = PipelineStore()
 
 
@@ -33,15 +35,14 @@ def run_server(tokenizer: str, model: str, dataset: Union[str, int]) -> None:
     # with open("codewit_semeru/codewit_semeru/frontend/assets/head_view.html", 'w') as file:
     #     file.write(html_head_view.data)
     # bertviz_html = parse_head_view()
-    print('Done Pipeline Run')
 
     app.layout = html.Div([
         html.Div(data_editor_components, className="dataEditor"),
-        html.Div(graph_settings_components, className="graphSettings"),
+        html.Div(graph_settings_components(models), className="graphSettings"),
         html.Div([dcc.Graph(id="graph")], className="graph"),
         # Attempt to add radio items to select some bertviz view
         # html.Div(dcc.RadioItems(["head", "neuron", "model"], id="bert_select")),
-        html.Div([get_bertviz()], className='bertviz'),
+        html.Div([get_bertviz()], className="bertviz"),
     ])
     # head_view(dataset, dataset)
 
