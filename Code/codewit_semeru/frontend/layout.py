@@ -27,7 +27,7 @@ data_editor_components = [
 
 graph_settings_components = [
     "Dataset:",
-    dcc.Dropdown(['Option 1', 'Option 2', 'Option 3']),
+    dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown"),
     "Model:",
     dcc.Dropdown(['Option 1', 'Option 2', 'Option 3']),
 ]
