@@ -1,9 +1,9 @@
-# To ensure app dependencies are ported from your virtual environment/host machine into your container, run 'pip freeze > requirements.txt' in the terminal to overwrite this file
+dash==2.6.2
+transformers>=4.22.0
+torch>=1.12.0
 pandas
-numpy
-jupyter_dash
 plotly
-dash
-huggingface
-transformers
-torch
+typing
+jupyter-dash==0.4.2
+dash-dangerously-set-inner-html
+beautifulsoup4
