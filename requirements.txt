@@ -6,4 +6,4 @@ plotly
 dash
 huggingface
 transformers
-jupyterlab-dash
+torch
