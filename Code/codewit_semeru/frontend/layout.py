@@ -25,9 +25,9 @@ data_editor_components = [
     ], className="dataField"),
     html.Div(["Predictions:", html.Br(), "[Insert table here]"], className="dataOutput")]
 
-graph_settings_components = [
+graph_settings_components = lambda models: [
     "Dataset:",
     dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown"),
     "Model:",
-    dcc.Dropdown(['Option 1', 'Option 2', 'Option 3']),
+    dcc.Dropdown(models),
 ]
