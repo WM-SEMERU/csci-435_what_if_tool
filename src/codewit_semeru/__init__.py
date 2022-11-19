@@ -10,7 +10,12 @@ __credits__ = 'College of William & Mary'
 
 
 from .frontend.display import run_server
+from .frontend.app import start
 
 
 def WITCode(tokenizer: str = "gpt2", model: str = "gpt2", dataset: str = "") -> None:
     run_server(tokenizer, model, dataset)
+
+
+def No_Dash_WIT() -> None:
+    start()
