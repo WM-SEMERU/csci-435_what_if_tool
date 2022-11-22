@@ -12,5 +12,5 @@ __credits__ = 'College of William & Mary'
 from .frontend.display import run_server
 
 
-def WITCode(tokenizer: str = "gpt2", model: str = "gpt2", dataset: str = "") -> None:
-    run_server(tokenizer, model, dataset)
+def WITCode(tokenizer: str = "gpt2", model: str = "gpt2", dataset: str = "", dataset_id: str = None) -> None:
+    run_server(tokenizer, model, dataset, dataset_id)

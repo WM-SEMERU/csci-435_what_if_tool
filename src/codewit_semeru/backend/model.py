@@ -8,15 +8,23 @@ from bertviz import head_view
 pipes = PipelineStore()
 
 
-def run_pipeline(model: str, dataset: str, tokenizer: str) -> None:
+""" def run_pipeline(tokenizer: str, model: str, dataset: str) -> None:
     print("Pipeline initiated")
     pipes.add_pipeline(Pipeline(tokenizer, model, dataset))
     print('Running...')
-    pipes.run_pipelines()
+    pipes.run_pipelines() """
 
 
-def preprocess() -> List[str]:
-    output_tkns = pipes.get_pipeline(0).output_tkns
+def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str) -> List[str]:
+    pipe_id = Pipeline.pipe_id(tokenizer, model, dataset_id)
+    pipe = pipes.get_pipeline(pipe_id)
+
+    if not pipe:
+        pipe = Pipeline(tokenizer, model, dataset, dataset_id)
+        pipes.add_pipeline(pipe)
+        pipes.run_pipe(pipe_id)
+
+    output_tkns = pipe.output_tkns
 
     counts = Counter(output_tkns)
     token_freq = pd.DataFrame(

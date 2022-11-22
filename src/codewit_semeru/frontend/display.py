@@ -1,4 +1,5 @@
 from typing import TypedDict, Union
+from uuid import uuid4
 from jupyter_dash import JupyterDash
 import plotly.express as px
 from dash import dcc, html, Input, Output
@@ -15,19 +16,34 @@ class Dataset(TypedDict):
     data: str
 
 
-DUMMY_DATA = [{"label": 1, "value": "This is some chunk of code that I wish to analyze"},
-              {"label": 2, "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
-              {"label": 3, "value": "def foo(bar): print(bar); foo(123)"}]
+DUMMY_DATA = [{"label": str(uuid4()), "value": "This is some chunk of code that I wish to analyze"},
+              {"label": str(uuid4()),
+               "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
+              {"label": str(uuid4()), "value": "def foo(bar): print(bar); foo(123)"}]
 
-models = ["gpt2", "gpt_neo", "gpt_neox"]
+models = ["gpt2", "codeparrot/codeparrot-small",
+          "EleutherAI/gpt-neo-1.3B", "EleutherAI/gpt-neox-20b", "codegen"]
 
 pipes = PipelineStore()
 
 
-def run_server(tokenizer: str, model: str, dataset: Union[str, int]) -> None:
+def run_server(tokenizer: str, model: str, dataset: Union[str, int], dataset_id: Union[str, None]) -> None:
     app = JupyterDash(__name__)
 
-    pipes.add_pipeline(Pipeline(tokenizer, model, dataset))
+    # TODO: refactor for efficiency
+    add_dataset = True
+    for i in DUMMY_DATA:
+        label, value = i["label"], i["value"]
+        if value == dataset:
+            dataset_id = label
+            add_dataset = False
+
+    if add_dataset:
+        dataset_id = str(uuid4())
+        DUMMY_DATA.append({"label": dataset_id, "value": dataset})
+
+    input_pipe = Pipeline(tokenizer, model, dataset, dataset_id)
+    pipes.add_pipeline(input_pipe)
     pipes.run_pipelines()
 
     # run_pipeline(model, dataset, tokenizer)
@@ -38,18 +54,27 @@ def run_server(tokenizer: str, model: str, dataset: Union[str, int]) -> None:
 
     app.layout = html.Div([
         html.Div(data_editor_components, className="dataEditor"),
-        html.Div(graph_settings_components(models), className="graphSettings"),
+        html.Div(graph_settings_components(
+            DUMMY_DATA, dataset, models, model), className="graphSettings"),
         html.Div([dcc.Graph(id="graph")], className="graph"),
         # Attempt to add radio items to select some bertviz view
         # html.Div(dcc.RadioItems(["head", "neuron", "model"], id="bert_select")),
-        html.Div([get_bertviz()], className="bertviz"),
+        # html.Div([get_bertviz()], className="bertviz"),
     ])
     # head_view(dataset, dataset)
 
-    @app.callback(Output("graph", "figure"), Input("dataset_dropdown", "value"))
-    def update_bar_chart(selected_dataset: Union[Dataset, str]):
-        df = preprocess()
-        print(df)
+    @app.callback(Output("graph", "figure"), Input("dataset_dropdown", "value"), Input("model_dropdown", "value"))
+    def update_bar_chart(selected_dataset: Union[str, None], selected_model: Union[str, None]):
+        selected_dataset_id = ""
+        for i in DUMMY_DATA:
+            label, value = i["label"], i["value"]
+            if value == selected_dataset:
+                selected_dataset_id = label
+
+        # print(f'{selected_dataset_id} {selected_dataset} {selected_model}')
+        df = preprocess(tokenizer, selected_model,
+                        selected_dataset, selected_dataset_id)
+        # print(df)
         fig = px.bar(df, x="frequency", y="token")
         return fig
 
