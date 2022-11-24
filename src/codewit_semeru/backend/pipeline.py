@@ -7,12 +7,12 @@ class Pipeline:
     # to-do https://github.com/tensorflow/tensorflow/issues/53529
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-    def __init__(self, tokenizer: str, model: str, dataset: Union[str, int]) -> None:
-        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+    def __init__(self, model: str, dataset: Union[str, int]) -> None:
+        self.tokenizer = AutoTokenizer.from_pretrained(model)
         self.model = AutoModelForCausalLM.from_pretrained(
             model, output_attentions=True).to(self.device)
         self.dataset = dataset
-        self.output = None
+        self.output = None  
         self.attention = None
         self.output_strs = None
         self.output_tkns = None
@@ -36,7 +36,7 @@ class Pipeline:
             self.output, skip_special_tokens=True)
         self.output_tkns = self.tokenizer.tokenize(self.output_strs[0])
 
-        self.completed = True
+        self.completed = True 
         # print(self.attention)
         print(self.input_tkns)
         print("Completed")

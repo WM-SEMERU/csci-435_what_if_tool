@@ -24,10 +24,10 @@ models = ["gpt2", "gpt_neo", "gpt_neox"]
 pipes = PipelineStore()
 
 
-def run_server(tokenizer: str, model: str, dataset: Union[str, int]) -> None:
+def run_server(model: str, dataset: Union[str, int]) -> None:
     app = JupyterDash(__name__)
 
-    pipes.add_pipeline(Pipeline(tokenizer, model, dataset))
+    pipes.add_pipeline(Pipeline(model, dataset))
     pipes.run_pipelines()
 
     # run_pipeline(model, dataset, tokenizer)
