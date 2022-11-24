@@ -8,9 +8,9 @@ from bertviz import head_view
 pipes = PipelineStore()
 
 
-def run_pipeline(model: str, dataset: str, tokenizer: str) -> None:
+def run_pipeline(model: str, dataset: List[str]) -> None:
     print("Pipeline initiated")
-    pipes.add_pipeline(Pipeline(tokenizer, model, dataset))
+    pipes.add_pipeline(Pipeline(model, dataset))
     print('Running...')
     pipes.run_pipelines()
 
