@@ -29,7 +29,7 @@ data_editor_components = [
 def graph_settings_components(datasets, dataset, models, model):
     return [
         "Dataset:",
-        dcc.Dropdown(datasets, id="dataset_dropdown", value=dataset),
+        dcc.Dropdown(datasets, id="dataset_dropdown", value=dataset[0]),
         "Model:",
         dcc.Dropdown(models, id="model_dropdown",
                      value=model if model in models else None),

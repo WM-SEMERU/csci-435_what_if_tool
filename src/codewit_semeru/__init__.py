@@ -9,8 +9,8 @@ __author__ = 'WM-SEMERU'
 __credits__ = 'College of William & Mary'
 
 
+from typing import List
 from .frontend.display import run_server
 
-
-def WITCode(tokenizer: str = "gpt2", model: str = "gpt2", dataset: str = "", dataset_id: str = None) -> None:
+def WITCode(tokenizer: str = "gpt2", model: str = "gpt2", dataset: List[str] = [], dataset_id: str = None) -> None:
     run_server(tokenizer, model, dataset, dataset_id)

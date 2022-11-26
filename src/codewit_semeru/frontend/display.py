@@ -1,4 +1,4 @@
-from typing import TypedDict, Union
+from typing import List, TypedDict, Union
 from uuid import uuid4
 from jupyter_dash import JupyterDash
 import plotly.express as px
@@ -15,36 +15,39 @@ class Dataset(TypedDict):
     id: int
     data: str
 
-
+#TODO: change label to meaningful value
+#Note: DUMMY_DATA values are strings, not lists of strings. Contains first string from list. 
 DUMMY_DATA = [{"label": str(uuid4()), "value": "This is some chunk of code that I wish to analyze"},
               {"label": str(uuid4()),
                "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
               {"label": str(uuid4()), "value": "def foo(bar): print(bar); foo(123)"}]
 
-models = ["gpt2", "codeparrot/codeparrot-small",
-          "EleutherAI/gpt-neo-1.3B", "EleutherAI/gpt-neox-20b", "codegen"]
+models = ["gpt2", "codeparrot/codeparrot-small", "codegen"]
 
 pipes = PipelineStore()
 
 
-def run_server(tokenizer: str, model: str, dataset: Union[str, int], dataset_id: Union[str, None]) -> None:
+def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union[str, None]) -> None:
     app = JupyterDash(__name__)
 
     # TODO: refactor for efficiency
     add_dataset = True
-    for i in DUMMY_DATA:
-        label, value = i["label"], i["value"]
-        if value == dataset:
-            dataset_id = label
-            add_dataset = False
+    if (len(dataset) == 1): 
+        for i in DUMMY_DATA:
+            label, value = i["label"], i["value"]
+            if value == dataset:
+                dataset_id = label
+                add_dataset = False
 
     if add_dataset:
         dataset_id = str(uuid4())
-        DUMMY_DATA.append({"label": dataset_id, "value": dataset})
+        DUMMY_DATA.append({"label": dataset_id, "value": dataset[0]})
 
+    #TODO: don't create new pipeline if identical one already exists!
     input_pipe = Pipeline(tokenizer, model, dataset, dataset_id)
     pipes.add_pipeline(input_pipe)
     pipes.run_pipelines()
+
 
     # run_pipeline(model, dataset, tokenizer)
     # html_head_view = get_bertviz()
