@@ -35,6 +35,7 @@
     	height: 80px;
     	background-color:#DDD;
         border-right:solid;
+        border-top:solid;
         float:left;
 	overflow:auto;
     }

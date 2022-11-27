@@ -28,17 +28,39 @@ data_editor_components = [
 graph_settings_components = lambda models: [
     html.Div([
         html.Div([
-            "Dataset:",
-            dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown_1"),
-            "Model:",
-            dcc.Dropdown(models)],
-            className="graphSettingsFill"),
+            "View:",
+            dcc.Dropdown(['single graph', 'two graph comparison'], id="view_dropdown")]),
         html.Div([
-            "Dataset:",
-            dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown_2"),
-            "Model:",
-            dcc.Dropdown(models)],
-            className="graphSettingsFill")
+            html.Div([
+                "Dataset:",
+                dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown_1"),
+                "Model:",
+                dcc.Dropdown(models),
+                "Num Tokens:",
+                dcc.Input(type="text", id="num_token_1"),
+                "Num Input Sequences:",
+                dcc.Input(type="text", id="input_seq_1"),
+                "Graph type:",
+                dcc.Dropdown(["code concept histogram", "basic token histogram", "bertviz"], id="graph_type_1"),
+                "Descriptive Stats:",
+                dcc.Dropdown(["name 1", "stat 1", "name 2", "stat 2"], id="desc_stats_1"),
+                ],
+                className="graphSettingsFill"),
+            html.Div([
+                "Dataset:",
+                dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown_2"),
+                "Model:",
+                dcc.Dropdown(models),
+                "Num Tokens:",
+                dcc.Input(type="text", id="num_token_2"),
+                "Num Input Sequences:",
+                dcc.Input(type="text", id="input_seq_2"),
+                "Graph type:",
+                dcc.Dropdown(["code concept histogram", "basic token histogram", "bertviz"], id="graph_type_2"),
+                "Descriptive Stats:",
+                dcc.Dropdown(["median", "mode", "max", "min", "std dev"], id="desc_stats_2"),
+                ],
+                className="graphSettingsFill")])
         ], className="graphSettings")]
 
 graph_display_components = [
