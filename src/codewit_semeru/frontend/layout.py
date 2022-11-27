@@ -26,8 +26,37 @@ data_editor_components = [
     html.Div(["Predictions:", html.Br(), "[Insert table here]"], className="dataOutput")]
 
 graph_settings_components = lambda models: [
+    html.Div([
+        html.Div([
+            "Dataset:",
+            dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown_1"),
+            "Model:",
+            dcc.Dropdown(models)],
+            className="graphSettingsFill"),
+        html.Div([
+            "Dataset:",
+            dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown_2"),
+            "Model:",
+            dcc.Dropdown(models)],
+            className="graphSettingsFill")
+        ], className="graphSettings")]
+
+graph_display_components = [
+    html.Div([
+        html.Div([
+            dcc.Graph(id="graph1")],
+            className="graphFill"),
+        html.Div([
+            dcc.Graph(id="graph2")],
+            className="graphFill")],
+        className="graph")]
+            
+
+"""
+graph_settings_components = lambda models: [
     "Dataset:",
     dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown"),
     "Model:",
     dcc.Dropdown(models),
 ]
+"""
