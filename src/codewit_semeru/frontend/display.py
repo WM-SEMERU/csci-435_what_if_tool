@@ -46,14 +46,14 @@ def run_server(model: str, dataset: Union[str, int]) -> None:
     ])
     # head_view(dataset, dataset)
 
-    @app.callback(Output("graph1", "figure"), Input("dataset_dropdown", "value"))
+    @app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"))
     def update_bar_chart(selected_dataset: Union[Dataset, str]):
         df = preprocess()
         print(df)
         fig = px.bar(df, x="frequency", y="token")
         return fig
 
-    @app.callback(Output("graph2", "figure"), Input("dataset_dropdown", "value"))
+    @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"))
     def update_bar_chart(selected_dataset: Union[Dataset, str]):
         df = preprocess()
         print(df)

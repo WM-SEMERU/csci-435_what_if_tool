@@ -1,6 +1,6 @@
 .dataEditor {
     	height: 100%;
-    	position: fixed;
+    	position: absolute;
     	width: 160px;
     	font-size: 1.5em;
     	background-color: #EEE;
@@ -24,6 +24,7 @@
     .graphSettings {
     	width: 100%;
     	min-height: 80px;
+    	margin-left: 162px;
     	background-color:#DDD;
         border-top:solid;
         border-right:solid;
@@ -35,6 +36,7 @@
     	background-color:#DDD;
         border-right:solid;
         float:left;
+	overflow:auto;
     }
     .graph{
     	width:100%;
