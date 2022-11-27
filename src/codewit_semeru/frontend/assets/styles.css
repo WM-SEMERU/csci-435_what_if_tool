@@ -23,7 +23,7 @@
     }
     .graphSettings {
     	width: 100%;
-    	min-height: 80px;
+    	min-height: 160px;
     	margin-left: 162px;
     	background-color:#DDD;
         border-top:solid;
@@ -32,7 +32,7 @@
     }
     .graphSettingsFill {
     	width: calc(50% - 12px);
-    	height: 80px;
+    	height: 160px;
     	background-color:#DDD;
         border-right:solid;
         border-top:solid;
