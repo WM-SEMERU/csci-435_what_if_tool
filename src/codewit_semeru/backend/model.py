@@ -19,17 +19,21 @@ def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str) -> Lis
     pipe_id = Pipeline.pipe_id(tokenizer, model, dataset_id)
     pipe = pipes.get_pipeline(pipe_id)
 
+    print("pipeid: ", pipe_id)
+
     if not pipe:
         pipe = Pipeline(tokenizer, model, dataset, dataset_id)
         pipes.add_pipeline(pipe)
         pipes.run_pipe(pipe_id)
 
     output_tkns = pipe.output_tkns
+    print("output_tkns: ", output_tkns)
 
     counts = Counter(output_tkns[0]) #Temporarily coded to analyze only the FIRST input sequence from the "dataset" WITCode() list parameter
     token_freq = pd.DataFrame(
         counts.items(), columns=["token", "frequency"]
     ).sort_values(by="frequency", ascending=False)
+    print("token_freq:", token_freq)
 
     return token_freq.head(20)
 

@@ -20,7 +20,7 @@ class Dataset(TypedDict):
 DUMMY_DATA = [{"label": str(uuid4()), "value": "This is some chunk of code that I wish to analyze"},
               {"label": str(uuid4()),
                "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
-              {"label": str(uuid4()), "value": "def foo(bar): print(bar); foo(123)"}]
+              {"label": str(uuid4()), "value": "def foo(bar): print(bar) foo(123)"}]
 
 models = ["gpt2", "codeparrot/codeparrot-small", "codegen"]
 
@@ -35,7 +35,7 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
     if (len(dataset) == 1): 
         for i in DUMMY_DATA:
             label, value = i["label"], i["value"]
-            if value == dataset:
+            if value == dataset[0]:
                 dataset_id = label
                 add_dataset = False
 
@@ -47,6 +47,7 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
     input_pipe = Pipeline(tokenizer, model, dataset, dataset_id)
     pipes.add_pipeline(input_pipe)
     pipes.run_pipelines()
+    print("DUMMY:", DUMMY_DATA)
 
 
     # run_pipeline(model, dataset, tokenizer)
@@ -66,9 +67,11 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
     ])
     # head_view(dataset, dataset)
 
+    #TODO: update so bar chart doesn't include input sequence in analyzed tokens! Only predicted tokens.
+    #TODO: update so string representations of tokens are shown rather than tokens themselves
     @app.callback(Output("graph", "figure"), Input("dataset_dropdown", "value"), Input("model_dropdown", "value"))
     def update_bar_chart(selected_dataset: Union[str, None], selected_model: Union[str, None]):
-        selected_dataset_id = ""
+        selected_dataset_id = None
         for i in DUMMY_DATA:
             label, value = i["label"], i["value"]
             if value == selected_dataset:
@@ -77,7 +80,7 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
         # print(f'{selected_dataset_id} {selected_dataset} {selected_model}')
         df = preprocess(tokenizer, selected_model,
                         selected_dataset, selected_dataset_id)
-        # print(df)
+        print("\ndf: ", df)
         fig = px.bar(df, x="frequency", y="token")
         return fig
 
