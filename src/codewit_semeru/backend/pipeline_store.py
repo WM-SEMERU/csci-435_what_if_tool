@@ -31,7 +31,7 @@ class PipelineStore(object):
 
     def run_pipe(self, id: int) -> None:
         if id not in self.pipelines:
-            raise Exception("rerun: pipeline not in store")
+            raise Exception("run: pipeline not in store")
         self.pipelines[id].run()
 
     def size(self) -> int:
