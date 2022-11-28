@@ -10,7 +10,7 @@ pipes = PipelineStore()
 
 """ def run_pipeline(tokenizer: str, model: str, dataset: str) -> None:
     print("Pipeline initiated")
-    pipes.add_pipeline(Pipeline(tokenizer, model, dataset))
+    pipes.add_pipeline(Pipeline(model, dataset))
     print('Running...')
     pipes.run_pipelines() """
 
