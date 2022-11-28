@@ -61,15 +61,15 @@ class Pipeline:
             counts = Counter(tokens)
             for token in counts:
                 self.output_tok_freqs[token].append(counts[token])
-        print("output_tok_freqs1: ", self.output_tok_freqs)
+        # print("output_tok_freqs1: ", self.output_tok_freqs)
 
         #Add 0 counts for tokens which were not within all predicted sequences
         for token in self.output_tok_freqs:
             for _ in range(len(self.output_tkns) - len(self.output_tok_freqs[token])):
                 self.output_tok_freqs[token].append(0)
-        print("output_tok_freqs2: ", self.output_tok_freqs)
+        # print("output_tok_freqs2: ", self.output_tok_freqs)
 
         self.completed = True
-        print("output_strs: ",self.output_strs)
+        # print("output_strs: ",self.output_strs)
         # print(self.attention)
         print(f"Pipeline completed for pipe {self.id}")

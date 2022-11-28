@@ -22,7 +22,7 @@ DUMMY_DATA = [{"label": str(uuid4()), "value": ["This is some chunk of code that
                "value": ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]},
               {"label": str(uuid4()), "value": ["def foo(bar): print(bar) foo(123)"]}]
 
-models = ["gpt2", "codeparrot/codeparrot-small", "codegen"]
+models = ["gpt2", "codeparrot/codeparrot-small", "codegen", "gpt-neo"] #add codebert, neox?
 
 pipes = PipelineStore()
 
@@ -72,8 +72,8 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
 
     #TODO: update so bar chart doesn't include input sequence in analyzed tokens! Only predicted tokens.
     #TODO: update so string representations of tokens are shown rather than tokens themselves
-    @app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"))
-    def update_bar_chart(selected_dataset: Union[Dataset, str]):
+    @app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown1", "value"), Input("desc_stats_1", "value"))
+    def update_bar_chart1(selected_dataset: Union[Dataset, str], selected_model: Union[str, None], selected_stat: str):
         selected_dataset_id = None
         for i in flattened_DUMMY:
             label, value = i["label"], i["value"]
@@ -82,13 +82,13 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
 
         # print(f'{selected_dataset_id} {selected_dataset} {selected_model}')
         df = preprocess(tokenizer, selected_model,
-                        selected_dataset, selected_dataset_id)
-        print("\ndf: ", df)
+                        selected_dataset, selected_dataset_id, selected_stat)
+        # print("\ndf: ", df)
         fig = px.bar(df, x="frequency", y="token")
         return fig
 
-    @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown", "value"))
-    def update_bar_chart(selected_dataset: Union[str, None], selected_model: Union[str, None]):
+    @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown2", "value"))
+    def update_bar_chart2(selected_dataset: Union[str, None], selected_model: Union[str, None]):
         selected_dataset_id = None
         for i in flattened_DUMMY:
             label, value = i["label"], i["value"]
@@ -98,7 +98,7 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
         # print(f'{selected_dataset_id} {selected_dataset} {selected_model}')
         df = preprocess(tokenizer, selected_model,
                         selected_dataset, selected_dataset_id)
-        print("\ndf: ", df)
+        # print("\ndf: ", df)
         fig = px.bar(df, x="frequency", y="token")
         return fig
 
