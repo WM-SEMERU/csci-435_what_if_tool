@@ -84,7 +84,7 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
         df = preprocess(tokenizer, selected_model,
                         selected_dataset, selected_dataset_id, selected_stat)
         # print("\ndf: ", df)
-        fig = px.bar(df, x="frequency", y="token")
+        fig = px.bar(df, x="frequency", y="token", labels={'frequency': str(selected_stat) + " token frequency"})
         return fig
 
     # @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown2", "value"))
