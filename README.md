@@ -7,19 +7,28 @@
 ## Development
 - Pip tool: user can install this tool from pip/conda and utilize with their NLP model
 - Python Backend: user designates dataset and model as parameters for our tool. Our tool then runs the model and produces some vector dataset in its object.
-- Ideas for Frontend
+- Jupyter-Dash Frontend: Jupyter-Dash allows for easy creation for data dashboard. Provides ability for easy callback methods with just Python.
+<!-- - Ideas for Frontend
   - Dashboard: Several visuals at the same time. This would allow the user to interact with each of the visuals provided
   - One at a time: User designates which view they want to see from their view at any given point
   - Visuals would be available in python notebooks
 - Some ideas: BertViz, Google WIT
 - Plotly is a great tool to create large dashboard from python. Could be useful for a dashboard view
-- Flask/Django can be used to implement the interactive component of the charts (connect listening events to python code)
+- Flask/Django can be used to implement the interactive component of the charts (connect listening events to python code) -->
 
-## Current Plans
-- [ ] Interview ML researchers (SEMERU) for what specific views would be useful for their exploration
+## Development Plans
+<!-- - [ ] Interview ML researchers (SEMERU) for what specific views would be useful for their exploration
 - [ ] Implement back-end to spit out some output to dynamic html
 - [ ] Create new views, probability distribution
-- [ ] Allow for some interactive aspect with the charts
+- [ ] Allow for some interactive aspect with the charts -->
+- [ ] Code concept groupings view: categorize each of the tokens generated in output based on what type they are in code language (declaration, assignment, functions, etc.)
+- [ ] Display some statistics about the generated output with specific model (median, max, min, etc.)
+- [ ] Dynamics re-execution of pipeline when:
+  - [ ] User edits # of tokens
+  - [ ] User edits # of input sequences
+  - [ ] User changes model
+  - [ ] User selects new descriptive statistic
+- [ ] Implement bertviz attention models inside app with Dash if possible
 
 ## Current Diagrams
 ### Components UML
