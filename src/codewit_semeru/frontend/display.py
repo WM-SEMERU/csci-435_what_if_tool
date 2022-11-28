@@ -11,15 +11,10 @@ from ..backend.pipeline_store import PipelineStore
 from .layout import data_editor_components, graph_settings_components
 
 
-class Dataset(TypedDict):
-    id: int
-    data: str
-
-
-DUMMY_DATA = [{"label": str(uuid4()), "value": "This is some chunk of code that I wish to analyze"},
+DUMMY_DATA = [{"label": str(uuid4()), "value": ["This is some chunk of code that I wish to analyze"]},
               {"label": str(uuid4()),
-               "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
-              {"label": str(uuid4()), "value": "def foo(bar): print(bar) foo(123)"}]
+               "value": ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]},
+              {"label": str(uuid4()), "value": ["def foo(bar): print(bar) foo(123)"]}]
 
 models = ["gpt2", "codeparrot/codeparrot-small",
           "codegen", "gpt-neo"]  # add codebert, neox?
@@ -29,11 +24,11 @@ pipes = PipelineStore()
 # TODO: convert to class to reduce redundancy of parameters
 
 
-def update_data_and_chart(tokenizer: str, selected_model: Union[str, None], selected_dataset: Union[Dataset, str], selected_stat: str):
+def update_data_and_chart(tokenizer: str, selected_model: Union[str, None], selected_dataset: List[str], selected_stat: str):
     selected_dataset_id = None
     for i in DUMMY_DATA:
         label, value = i["label"], i["value"]
-        if value == selected_dataset:
+        if value[0] == selected_dataset[0]:
             selected_dataset_id = label
 
     print(
@@ -45,14 +40,14 @@ def update_data_and_chart(tokenizer: str, selected_model: Union[str, None], sele
     return fig
 
 
-def run_server(tokenizer: str, model: str, dataset: str, dataset_id: Union[str, None]) -> None:
+def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union[str, None]) -> None:
     app = JupyterDash(__name__)
 
     # TODO: refactor for efficiency
     add_dataset = True
     for i in DUMMY_DATA:
         label, value = i["label"], i["value"]
-        if value == dataset:
+        if value[0] == dataset[0]:
             dataset_id = label
             add_dataset = False
 
@@ -86,7 +81,7 @@ def run_server(tokenizer: str, model: str, dataset: str, dataset_id: Union[str, 
     # TODO: update so bar chart doesn't include input sequence in analyzed tokens! Only predicted tokens.
     # TODO: update so string representations of tokens are shown rather than tokens themselves
     @app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown_1", "value"), Input("desc_stats_1", "value"))
-    def update_bar_graph1(selected_dataset: Union[Dataset, str], selected_model: Union[str, None], selected_stat: Union[str, None]):
+    def update_bar_graph1(selected_dataset: List[str], selected_model: Union[str, None], selected_stat: Union[str, None]):
         return update_data_and_chart(tokenizer, selected_model if selected_model else model, selected_dataset, selected_stat)
 
     """ @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"))

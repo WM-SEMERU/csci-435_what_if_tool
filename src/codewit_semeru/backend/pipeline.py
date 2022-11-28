@@ -24,7 +24,7 @@ class Pipeline:
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer)
         self.model = AutoModelForCausalLM.from_pretrained(
             model, output_attentions=True).to(self.device)
-        self.dataset = dataset
+        self.dataset: List[str] = dataset
         self.dataset_id = dataset_id
 
         self.output = []
