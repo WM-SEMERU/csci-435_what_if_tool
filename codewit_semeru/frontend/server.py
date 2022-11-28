@@ -31,7 +31,7 @@ class CodeWITServer():
         
         self.model_2, self.dataset_2 = "", []
 
-        dataset_id = next((d["label"] for d in DUMMY_DATA if d["value"][0] == dataset[0]), "")
+        dataset_id = next((d["label"] for d in DUMMY_DATA if d["value"] == dataset), "")
         if not dataset_id:
             dataset_id = str(uuid4())
             DUMMY_DATA.append({"label": dataset_id, "value": dataset})
@@ -44,7 +44,7 @@ class CodeWITServer():
             dataset["value"])} for dataset in DUMMY_DATA]
 
         self.app.layout = html.Div([
-            #html.Div(data_editor_components, className="dataEditor"),
+            # html.Div(data_editor_components, className="dataEditor"),
             html.Div(graph_settings_components(
                 self.FLAT_DUMMY, " ".join(dataset), models, model), className="graphSettings"),
             html.Div([dcc.Graph(id="graph1"), dcc.Graph(
@@ -69,7 +69,7 @@ class CodeWITServer():
                         selected_dataset_id, selected_stat)
         print("Done!")
         
-        fig = px.bar(df, x="frequency", y="token")
+        fig = px.bar(df, x="frequency", y="token", labels={'frequency': str(selected_stat) + " token frequency"})
         return fig
 
     def run(self) -> None:
