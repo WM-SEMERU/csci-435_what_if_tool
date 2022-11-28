@@ -71,6 +71,6 @@ class Pipeline:
         # print("output_tok_freqs2: ", self.output_tok_freqs)
 
         self.completed = True
-        # print("output_strs: ",self.output_strs)
+        print("output_strs: ",self.output_strs)
         # print(self.attention)
         print(f"Pipeline completed for pipe {self.id}")
