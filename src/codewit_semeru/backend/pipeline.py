@@ -45,6 +45,7 @@ class Pipeline:
             self.input_tkns.append(self.tokenizer.convert_ids_to_tokens(
                 self.input_ids[i][0]))
 
+    #TODO: Update so output doesn't contain input sequence!
     def run(self) -> None:
         # Weird interaction here where specifiying transformers generate pipeline + getting attention does not quite work...
         # to-do : figure out how to extract all necessary info from one pipeline run
@@ -63,7 +64,7 @@ class Pipeline:
                 self.output_tok_freqs[token].append(counts[token])
         # print("output_tok_freqs1: ", self.output_tok_freqs)
 
-        #Add 0 counts for tokens which were not within all predicted sequences
+        #Add 0 freq counts for tokens which were not within all predicted sequences
         for token in self.output_tok_freqs:
             for _ in range(len(self.output_tkns) - len(self.output_tok_freqs[token])):
                 self.output_tok_freqs[token].append(0)

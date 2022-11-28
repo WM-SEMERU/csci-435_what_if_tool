@@ -37,6 +37,8 @@ def graph_settings_components (datasets, dataset, models, model):
                     dcc.Dropdown(datasets, value = dataset, id="dataset_dropdown_1"),
                     "Model:",
                     dcc.Dropdown(models, id = "model_dropdown1", value = model),
+                    "Descriptive Stat:",
+                    dcc.Dropdown(["mean", "median",  "std dev", "mode", "max", "min"], id="desc_stats_1", value = "mean"),
                     "Num Tokens:",
                     dcc.Input(type="text", id="num_token_1"),
                     html.Br(),
@@ -44,9 +46,7 @@ def graph_settings_components (datasets, dataset, models, model):
                     dcc.Input(type="text", id="input_seq_1"),
                     html.Br(),
                     "Graph type:",
-                    dcc.Dropdown(["code concept histogram", "basic token histogram", "bertviz"], id="graph_type_1"),
-                    "Descriptive Stats:",
-                    dcc.Dropdown(["mean", "median",  "std dev", "mode", "max", "min"], id="desc_stats_1", value = "mean"),
+                    dcc.Dropdown(["code concept histogram", "basic token histogram", "bertviz"], id="graph_type_1")
                     ],
                     className="graphSettingsFill"),
                 html.Div([

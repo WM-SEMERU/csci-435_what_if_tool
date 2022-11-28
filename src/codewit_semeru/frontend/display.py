@@ -87,20 +87,20 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
         fig = px.bar(df, x="frequency", y="token")
         return fig
 
-    @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown2", "value"))
-    def update_bar_chart2(selected_dataset: Union[str, None], selected_model: Union[str, None]):
-        selected_dataset_id = None
-        for i in flattened_DUMMY:
-            label, value = i["label"], i["value"]
-            if value == selected_dataset:
-                selected_dataset_id = label
+    # @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown2", "value"))
+    # def update_bar_chart2(selected_dataset: Union[str, None], selected_model: Union[str, None]):
+    #     selected_dataset_id = None
+    #     for i in flattened_DUMMY:
+    #         label, value = i["label"], i["value"]
+    #         if value == selected_dataset:
+    #             selected_dataset_id = label
 
-        # print(f'{selected_dataset_id} {selected_dataset} {selected_model}')
-        df = preprocess(tokenizer, selected_model,
-                        selected_dataset, selected_dataset_id)
-        # print("\ndf: ", df)
-        fig = px.bar(df, x="frequency", y="token")
-        return fig
+    #     # print(f'{selected_dataset_id} {selected_dataset} {selected_model}')
+    #     df = preprocess(tokenizer, selected_model,
+    #                     selected_dataset, selected_dataset_id)
+    #     # print("\ndf: ", df)
+    #     fig = px.bar(df, x="frequency", y="token")
+    #     return fig
 
 
     # @app.callback(Output("bertviz", "children"), Input("dataset_dropdown", "value"))
