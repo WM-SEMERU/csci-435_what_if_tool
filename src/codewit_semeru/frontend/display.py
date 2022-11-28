@@ -39,19 +39,27 @@ def run_server(model: str, dataset: Union[str, int]) -> None:
     app.layout = html.Div([
         html.Div(data_editor_components, className="dataEditor"),
         html.Div(graph_settings_components(models), className="graphSettings"),
-        html.Div([dcc.Graph(id="graph")], className="graph"),
+        html.Div([dcc.Graph(id="graph1"),dcc.Graph(id="graph2")], className="graph"),
         # Attempt to add radio items to select some bertviz view
         # html.Div(dcc.RadioItems(["head", "neuron", "model"], id="bert_select")),
         html.Div([get_bertviz()], className="bertviz"),
     ])
     # head_view(dataset, dataset)
 
-    @app.callback(Output("graph", "figure"), Input("dataset_dropdown", "value"))
+    @app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"))
     def update_bar_chart(selected_dataset: Union[Dataset, str]):
         df = preprocess()
         print(df)
         fig = px.bar(df, x="frequency", y="token")
         return fig
+
+    @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"))
+    def update_bar_chart(selected_dataset: Union[Dataset, str]):
+        df = preprocess()
+        print(df)
+        fig = px.bar(df, x="frequency", y="token")
+        return fig
+
 
     # @app.callback(Output("bertviz", "children"), Input("dataset_dropdown", "value"))
     # def update_bertviz(value):
