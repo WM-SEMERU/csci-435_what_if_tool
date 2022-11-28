@@ -19,6 +19,8 @@ class PipelineStore(object):
         self.pipelines.pop(index)
 
     def get_pipeline(self, x: int) -> None:
+        if x >= len(self.pipelines):
+            return
         return self.pipelines[x]
 
     def run_pipelines(self) -> None:
