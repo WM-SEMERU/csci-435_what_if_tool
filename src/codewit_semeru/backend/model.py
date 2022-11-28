@@ -1,6 +1,6 @@
 from typing import List
-from collections import Counter
 import pandas as pd
+import statistics
 from .pipeline import Pipeline
 from .pipeline_store import PipelineStore
 from bertviz import head_view
@@ -15,7 +15,7 @@ pipes = PipelineStore()
     pipes.run_pipelines() """
 
 
-def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str) -> List[str]:
+def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str, stat: str = "mean") -> List[str]:
     pipe_id = Pipeline.pipe_id(tokenizer, model, dataset_id)
     pipe = pipes.get_pipeline(pipe_id)
 
@@ -26,17 +26,35 @@ def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str) -> Lis
         pipes.add_pipeline(pipe)
         pipes.run_pipe(pipe_id)
 
-    output_tkns = pipe.output_tkns
-    print("output_tkns: ", output_tkns)
+    if stat == "mean":
+        stats_func = statistics.mean
+    elif stat == "median":
+        stats_func = statistics.median
+    elif stat == "std dev":
+        stats_func = statistics.stdev
+    elif stat == "max":
+        stats_func = max
+    elif stat == "min":
+        stats_func = min
+    elif stat == "mode":
+        stats_func = statistics.mode
+    else:
+        raise ValueError("Supported statistics are mean, median, std dev, mode, max, and min. Please use one of them.")
 
-    counts = Counter(output_tkns[0]) #Temporarily coded to analyze only the FIRST input sequence from the "dataset" WITCode() list parameter
+    # output_tkns = pipe.output_tkns
+    output_tkn_freqs = pipe.output_tok_freqs
+
+    for tkn in output_tkn_freqs:
+        output_tkn_freqs[tkn] = stats_func(output_tkn_freqs[tkn])
+
     token_freq = pd.DataFrame(
-        counts.items(), columns=["token", "frequency"]
+        output_tkn_freqs.items(), columns=["token", "frequency"]
     ).sort_values(by="frequency", ascending=False)
     print("token_freq:", token_freq)
 
     return token_freq.head(20)
 
+    #["median", "mean", "max", "min", "std dev"]
 
 def get_bertviz():
     #Temporarily coded so that bertviz analyzes only the FIRST input sequence from the "dataset" WITCode() list parameter 

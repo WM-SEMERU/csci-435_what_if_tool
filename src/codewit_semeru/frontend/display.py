@@ -17,10 +17,10 @@ class Dataset(TypedDict):
 
 #TODO: change label to meaningful value
 #Note: DUMMY_DATA values are strings, not lists of strings. Contains first string from list. 
-DUMMY_DATA = [{"label": str(uuid4()), "value": "This is some chunk of code that I wish to analyze"},
+DUMMY_DATA = [{"label": str(uuid4()), "value": ["This is some chunk of code that I wish to analyze"]},
               {"label": str(uuid4()),
-               "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
-              {"label": str(uuid4()), "value": "def foo(bar): print(bar) foo(123)"}]
+               "value": ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]},
+              {"label": str(uuid4()), "value": ["def foo(bar): print(bar) foo(123)"]}]
 
 models = ["gpt2", "codeparrot/codeparrot-small", "codegen"]
 
@@ -32,16 +32,15 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
 
     # TODO: refactor for efficiency
     add_dataset = True
-    if (len(dataset) == 1): 
-        for i in DUMMY_DATA:
-            label, value = i["label"], i["value"]
-            if value == dataset[0]:
-                dataset_id = label
-                add_dataset = False
+    for i in DUMMY_DATA:
+        label, value = i["label"], i["value"]
+        if value == dataset:
+            dataset_id = label
+            add_dataset = False
 
     if add_dataset:
         dataset_id = str(uuid4())
-        DUMMY_DATA.append({"label": dataset_id, "value": dataset[0]})
+        DUMMY_DATA.append({"label": dataset_id, "value": dataset})
 
     #TODO: don't create new pipeline if identical one already exists!
     input_pipe = Pipeline(tokenizer, model, dataset, dataset_id)
@@ -49,6 +48,10 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
     pipes.run_pipelines()
     print("DUMMY:", DUMMY_DATA)
 
+    flattened_DUMMY = []
+    for dummy_dict in DUMMY_DATA:
+        dummer_dummy_dict = {'label': dummy_dict['label'], 'value': ' '.join(dummy_dict['value'])}
+        flattened_DUMMY.append(dummer_dummy_dict)
 
     # run_pipeline(model, dataset, tokenizer)
     # html_head_view = get_bertviz()
@@ -59,7 +62,7 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
     app.layout = html.Div([
         html.Div(data_editor_components, className="dataEditor"),
         html.Div(graph_settings_components(
-            DUMMY_DATA, dataset, models, model), className="graphSettings"),
+            flattened_DUMMY, ' '.join(dataset), models, model), className="graphSettings"),
         html.Div([dcc.Graph(id="graph")], className="graph"),
         # Attempt to add radio items to select some bertviz view
         # html.Div(dcc.RadioItems(["head", "neuron", "model"], id="bert_select")),
@@ -72,7 +75,7 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
     @app.callback(Output("graph", "figure"), Input("dataset_dropdown", "value"), Input("model_dropdown", "value"))
     def update_bar_chart(selected_dataset: Union[str, None], selected_model: Union[str, None]):
         selected_dataset_id = None
-        for i in DUMMY_DATA:
+        for i in flattened_DUMMY:
             label, value = i["label"], i["value"]
             if value == selected_dataset:
                 selected_dataset_id = label
