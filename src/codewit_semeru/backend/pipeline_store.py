@@ -1,3 +1,4 @@
+from typing import Union
 from .pipeline import Pipeline
 
 
@@ -8,28 +9,30 @@ class PipelineStore(object):
         return cls.instance
 
     def __init__(self) -> None:
-        self.pipelines = []
+        self.pipelines = {}
 
-    def add_pipeline(self, item: Pipeline) -> None:
-        self.pipelines.insert(0, item)
+    def add_pipeline(self, pipe: Pipeline) -> None:
+        self.pipelines[pipe.id] = pipe
 
-    def remove_pipeline(self, index: int) -> None:
+    def remove_pipeline(self, id: int) -> None:
         if not self.size():
-            return
-        self.pipelines.pop(index)
+            raise Exception("remove: empty store")
+        del self.pipelines[id]
 
-    def get_pipeline(self, x: int) -> None:
-        return self.pipelines[x]
+    def get_pipeline(self, id: str) -> Union[Pipeline, None]:
+        if id not in self.pipelines:
+            return None
+        return self.pipelines[id]
 
     def run_pipelines(self) -> None:
-        for pipe in self.pipelines:
+        for _, pipe in self.pipelines.items():
             if not pipe.completed:
                 pipe.run()
 
-    def rerun_pipe(self, x: int) -> None:
-        if x >= len(self.pipelines):
-            return
-        self.pipelines[x].run()
+    def run_pipe(self, id: int) -> None:
+        if id not in self.pipelines:
+            raise Exception("rerun: pipeline not in store")
+        self.pipelines[id].run()
 
     def size(self) -> int:
         return len(self.pipelines)
