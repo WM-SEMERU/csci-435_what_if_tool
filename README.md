@@ -32,10 +32,10 @@
 
 ## Current Diagrams
 ### Components UML
-![Components](Artifacts/component.png)
+![Components](Artifacts/component-diagram-updated.png)
 
 ### Sequence Diagram
-![Sequence Diagram](Artifacts/sequence.png)
+![Sequence Diagram](Artifacts/sequence-diagram-updated.png)
 
 ## Installation
 First prototype is currently available on PyPi. It does not do much (yet), but you can initialize an interactive bar graph of token counts in your notebook.
