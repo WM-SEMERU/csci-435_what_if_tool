@@ -25,23 +25,20 @@ data_editor_components = [
     ], className="dataField"),
     html.Div(["Predictions:", html.Br(), "[Insert table here]"], className="dataOutput")]
 
-
-def graph_settings_components(datasets, dataset, models, model):
+def graph_settings_components (datasets, dataset, models, model):
     return [
         html.Div([
             html.Div([
                 "View:",
-                dcc.Dropdown(["single graph", "two graph comparison"], id="view_dropdown")]),
+                dcc.Dropdown(['single graph', 'two graph comparison'], id="view_dropdown")]),
             html.Div([
                 html.Div([
                     "Dataset:",
-                    dcc.Dropdown(datasets, value=dataset,
-                                 id="dataset_dropdown_1"),
+                    dcc.Dropdown(datasets, value = dataset, id="dataset_dropdown_1"),
                     "Model:",
-                    dcc.Dropdown(models, id="model_dropdown_1", value=model),
+                    dcc.Dropdown(models, id = "model_dropdown1", value = model),
                     "Descriptive Stat:",
-                    dcc.Dropdown(["mean", "median",  "std dev", "mode",
-                                 "max", "min"], id="desc_stats_1", value="mean"),
+                    dcc.Dropdown(["mean", "median",  "std dev", "mode", "max", "min"], id="desc_stats_1", value = "mean"),
                     "Num Tokens:",
                     dcc.Input(type="text", id="num_token_1"),
                     html.Br(),
@@ -49,16 +46,14 @@ def graph_settings_components(datasets, dataset, models, model):
                     dcc.Input(type="text", id="input_seq_1"),
                     html.Br(),
                     "Graph type:",
-                    dcc.Dropdown(
-                        ["code concept histogram", "basic token histogram"], id="graph_type_1")
-                ],
+                    dcc.Dropdown(["code concept histogram", "basic token histogram", "bertviz"], id="graph_type_1")
+                    ],
                     className="graphSettingsFill"),
                 html.Div([
                     "Dataset:",
-                    dcc.Dropdown(["Option 1", "Option 2", "Option 3"],
-                                 id="dataset_dropdown_2"),
+                    dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown_2"),
                     "Model:",
-                    dcc.Dropdown(models, id="model_dropdown_2"),
+                    dcc.Dropdown(models, id="model_dropdown2"),
                     "Num Tokens:",
                     dcc.Input(type="text", id="num_token_2"),
                     html.Br(),
@@ -66,16 +61,13 @@ def graph_settings_components(datasets, dataset, models, model):
                     dcc.Input(type="text", id="input_seq_2"),
                     html.Br(),
                     "Graph type:",
-                    dcc.Dropdown(
-                        ["code concept histogram", "basic token histogram"], id="graph_type_2"),
+                    dcc.Dropdown(["code concept histogram", "basic token histogram", "bertviz"], id="graph_type_2"),
                     "Descriptive Stats:",
-                    dcc.Dropdown(["median", "mode", "max", "min",
-                                 "std dev"], id="desc_stats_2"),
-                ],
+                    dcc.Dropdown(["median", "mode", "max", "min", "std dev"], id="desc_stats_2"),
+                    ],
                     className="graphSettingsFill")])
-        ], className="graphSettings")
-    ]
-
+            ], className="graphSettings")
+        ]
 
 graph_display_components = [
     html.Div([
@@ -86,12 +78,12 @@ graph_display_components = [
             dcc.Graph(id="graph2")],
             className="graphFill")],
         className="graph")]
-
+            
 
 """
 graph_settings_components = lambda models: [
     "Dataset:",
-    dcc.Dropdown(["Option 1", "Option 2", "Option 3"], id="dataset_dropdown"),
+    dcc.Dropdown(['Option 1', 'Option 2', 'Option 3'], id="dataset_dropdown"),
     "Model:",
     dcc.Dropdown(models),
 ]
