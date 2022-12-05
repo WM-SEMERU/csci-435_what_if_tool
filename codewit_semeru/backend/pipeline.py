@@ -24,10 +24,10 @@ class Pipeline:
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer)
         self.model = AutoModelForCausalLM.from_pretrained(
             model, output_attentions=True).to(self.device)
-        self.dataset = dataset
+        self.dataset: List[str] = dataset
         self.dataset_id = dataset_id
 
-        self.output = []  
+        self.output = []
         self.test_output = []
         self.attention = []
         self.output_strs: List[str] = []
@@ -45,7 +45,7 @@ class Pipeline:
             self.input_tkns.append(self.tokenizer.convert_ids_to_tokens(
                 self.input_ids[i][0]))
 
-    #TODO: Update so output doesn't contain input sequence!
+    # TODO: Update so output doesn't contain input sequence!
     def run(self) -> None:
         # Weird interaction here where specifiying transformers generate pipeline + getting attention does not quite work...
         # to-do : figure out how to extract all necessary info from one pipeline run
@@ -56,21 +56,20 @@ class Pipeline:
             self.attention.append(self.test_output[i][-1])
             self.output_strs.append(self.tokenizer.batch_decode(
                 self.output[i], skip_special_tokens=True))
-            self.output_tkns.append(self.tokenizer.tokenize(self.output_strs[i][0]))
+            self.output_tkns.append(
+                self.tokenizer.tokenize(self.output_strs[i][0]))
 
-        for tokens in self.output_tkns:  
+        for tokens in self.output_tkns:
             counts = Counter(tokens)
             for token in counts:
                 self.output_tok_freqs[token].append(counts[token])
-        # print("output_tok_freqs1: ", self.output_tok_freqs)
 
-        #Add 0 freq counts for tokens which were not within all predicted sequences
+        # Add 0 freq counts for tokens which were not within all predicted sequences
         for token in self.output_tok_freqs:
             for _ in range(len(self.output_tkns) - len(self.output_tok_freqs[token])):
                 self.output_tok_freqs[token].append(0)
-        # print("output_tok_freqs2: ", self.output_tok_freqs)
 
         self.completed = True
-        print("output_strs: ",self.output_strs)
+        # print("output_strs: ",self.output_strs)
         # print(self.attention)
         print(f"Pipeline completed for pipe {self.id}")
