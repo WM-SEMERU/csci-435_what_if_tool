@@ -42,8 +42,8 @@ class Pipeline:
 
     def query_model(self, payload: str):
         print(payload)
+        # TODO Inputs for Salesforce model. Passing a list does not seem to work, maybe have to send 3 separate request?
         if self.model == "Salesforce/codegen-350M-mono":
-            # for i in range(len(payload)):
             data = {"inputs": payload}
         else:
             data = json.dumps(payload)
