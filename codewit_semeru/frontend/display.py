@@ -3,9 +3,8 @@ from uuid import uuid4
 from jupyter_dash import JupyterDash
 import plotly.express as px
 from dash import dcc, html, Input, Output
-from bertviz import head_view
 
-from ..backend.model import preprocess, get_bertviz
+from ..backend.model import preprocess
 from ..backend.pipeline import Pipeline
 from ..backend.pipeline_store import PipelineStore
 from .layout import data_editor_components, graph_settings_components
@@ -16,7 +15,8 @@ DUMMY_DATA = [{"label": str(uuid4()), "value": ["This is some chunk of code that
                "value": ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]},
               {"label": str(uuid4()), "value": ["def foo(bar): print(bar) foo(123)"]}]
 
-models = ["gpt2", "codeparrot/codeparrot-small", "codegen", "gpt-neo"] #add codebert, neox?
+models = ["gpt2", "codeparrot/codeparrot-small",
+          "codegen", "gpt-neo"]  # add codebert, neox?
 
 pipes = PipelineStore()
 
@@ -60,37 +60,26 @@ def run_server(model: str, dataset: List[str], dataset_id: Union[str, None]) -> 
         dataset_id = str(uuid4())
         DUMMY_DATA.append({"label": dataset_id, "value": dataset})
 
-    #TODO: don't create new pipeline if identical one already exists!
-    input_pipe = Pipeline(tokenizer, model, dataset, dataset_id)
+    # TODO: don't create new pipeline if identical one already exists!
+    input_pipe = Pipeline(model, dataset, dataset_id)
     pipes.add_pipeline(input_pipe)
     pipes.run_pipelines()
-    print("DUMMY:", DUMMY_DATA)
 
     FLAT_DUMMY = [{"label": dataset["label"], "value": " ".join(
         dataset["value"])} for dataset in DUMMY_DATA]
 
-    # run_pipeline(model, dataset, tokenizer)
-    # html_head_view = get_bertviz()
-    # with open("codewit_semeru/codewit_semeru/frontend/assets/head_view.html", 'w') as file:
-    #     file.write(html_head_view.data)
-    # bertviz_html = parse_head_view()
-
     app.layout = html.Div([
         html.Div(data_editor_components, className="dataEditor"),
         html.Div(graph_settings_components(
-            flattened_DUMMY, ' '.join(dataset), models, model), className="graphSettings"),
-        html.Div([dcc.Graph(id="graph1"),dcc.Graph(id="graph2")], className="graph"),
-        # Attempt to add radio items to select some bertviz view
-        # html.Div(dcc.RadioItems(["head", "neuron", "model"], id="bert_select")),
-        # html.Div([get_bertviz()], className="bertviz"),
+            FLAT_DUMMY, " ".join(dataset), models, model), className="graphSettings"),
+        html.Div([dcc.Graph(id="graph1"), dcc.Graph(
+            id="graph2")], className="graph")
     ])
-    # head_view(dataset, dataset)
 
     # TODO: update so bar chart doesn't include input sequence in analyzed tokens! Only predicted tokens.
     # TODO: update so string representations of tokens are shown rather than tokens themselves
     @app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown_1", "value"), Input("desc_stats_1", "value"))
     def update_bar_graph1(selected_dataset: List[str], selected_model: Union[str, None], selected_stat: Union[str, None]):
-        print(selected_dataset if selected_dataset else dataset)
         return update_data_and_chart(FLAT_DUMMY, selected_model if selected_model else model, selected_dataset if selected_dataset else dataset, selected_stat)
 
     """ @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"))
