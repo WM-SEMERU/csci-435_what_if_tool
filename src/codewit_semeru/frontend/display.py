@@ -37,7 +37,7 @@ def run_server(model: str, dataset: Union[str, int]) -> None:
     # bertviz_html = parse_head_view()
 
     app.layout = html.Div([
-        html.Div(data_editor_components, className="dataEditor"),
+        # html.Div(data_editor_components, className="dataEditor"),
         html.Div(graph_settings_components(models), className="graphSettings"),
         html.Div([dcc.Graph(id="graph1"),dcc.Graph(id="graph2")], className="graph"),
         # Attempt to add radio items to select some bertviz view
