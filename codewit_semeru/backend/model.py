@@ -17,19 +17,17 @@ pipes = PipelineStore()
 
 
 def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str, stat: str = "mean") -> List[str]:
-    
+
     # print("model: ", model)
     # print("dataset: ", dataset)
     # print("dataset_id: ", dataset_id)
     pipe_id = Pipeline.pipe_id(tokenizer, model, dataset_id)
     pipe = pipes.get_pipeline(pipe_id)
 
-    print("pipeid: ", pipe_id)
-
     if not pipe:
         pipe = Pipeline(tokenizer, model, dataset, dataset_id)
         pipes.add_pipeline(pipe)
-        pipes.run_pipe(pipe_id)
+        pipes.run_pipe(pipe.id)
 
     if stat == "mean":
         stats_func = statistics.mean
@@ -44,7 +42,8 @@ def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str, stat: 
     elif stat == "mode":
         stats_func = statistics.mode
     else:
-        raise ValueError("Supported statistics are mean, median, std dev, mode, max, and min. Please use one of them.")
+        raise ValueError(
+            "Supported statistics are mean, median, std dev, mode, max, and min. Please use one of them.")
 
     # output_tkns = pipe.output_tkns
     # print("pipe.output_tok_freqs: ", pipe.output_tok_freqs)
@@ -61,8 +60,9 @@ def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str, stat: 
 
     #["median", "mean", "max", "min", "std dev"]
 
+
 def get_bertviz():
-    #Temporarily coded so that bertviz analyzes only the FIRST input sequence from the "dataset" WITCode() list parameter 
+    # Temporarily coded so that bertviz analyzes only the FIRST input sequence from the "dataset" WITCode() list parameter
     attention, input_tkns = pipes.get_pipeline(
         0).attention[0], pipes.get_pipeline(0).input_tkns[0]
     return head_view(attention, input_tkns)
