@@ -29,7 +29,7 @@ def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str, stat: 
     if not pipe:
         pipe = Pipeline(tokenizer, model, dataset, dataset_id)
         pipes.add_pipeline(pipe)
-        pipes.run_pipe(pipe_id)
+        pipes.run_pipe(pipe.id)
 
     if stat == "mean":
         stats_func = statistics.mean

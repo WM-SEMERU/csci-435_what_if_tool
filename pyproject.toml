@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 [project]
 name = "codewit_semeru"
-version = "0.1.1"
+version = "0.0.1"
 authors = [
   { name="Ignat Miagkov", email="iamiagkov@wm.edu" },
   { name="Duke Tran", email="dtran@wm.edu" }
@@ -16,7 +16,6 @@ dependencies = [
   'transformers',
   'pandas',
   'torch',
-  'typing',
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
