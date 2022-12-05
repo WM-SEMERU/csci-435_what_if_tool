@@ -66,10 +66,13 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
     #     file.write(html_head_view.data)
     # bertviz_html = parse_head_view()
 
+    FLAT_DUMMY = [{"label": dataset["label"], "value": ' '.join(
+        dataset["value"])} for dataset in DUMMY_DATA]
+
     app.layout = html.Div([
         html.Div(data_editor_components, className="dataEditor"),
         html.Div(graph_settings_components(
-            DUMMY_DATA, dataset, models, model), className="graphSettings"),
+            FLAT_DUMMY, ' '.join(dataset), models, model), className="graphSettings"),
         html.Div([dcc.Graph(id="graph1"), dcc.Graph(
             id="graph2")], className="graph"),
         # Attempt to add radio items to select some bertviz view
@@ -82,7 +85,7 @@ def run_server(tokenizer: str, model: str, dataset: List[str], dataset_id: Union
     # TODO: update so string representations of tokens are shown rather than tokens themselves
     @app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown_1", "value"), Input("desc_stats_1", "value"))
     def update_bar_graph1(selected_dataset: List[str], selected_model: Union[str, None], selected_stat: Union[str, None]):
-        return update_data_and_chart(tokenizer, selected_model if selected_model else model, selected_dataset, selected_stat)
+        return update_data_and_chart(tokenizer, selected_model if selected_model else model, selected_dataset if selected_dataset else dataset, selected_stat)
 
     """ @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"))
     def update_bar_graph2(selected_dataset: Union[str, None], selected_model: Union[str, None], selected_stat: Union[str, None]):
