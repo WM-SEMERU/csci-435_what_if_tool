@@ -10,11 +10,6 @@ from ..backend.pipeline_store import PipelineStore
 from .layout import data_editor_components, graph_settings_components
 
 
-class Dataset(TypedDict):
-    id: int
-    data: str
-
-
 DUMMY_DATA = [{"label": str(uuid4()), "value": ["This is some chunk of code that I wish to analyze"]},
               {"label": str(uuid4()),
                "value": ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]},
@@ -25,6 +20,24 @@ models = ["gpt2", "codeparrot/codeparrot-small",
 
 pipes = PipelineStore()
 
+# TODO: convert to class to reduce redundancy of parameters
+
+def update_data_and_chart(selected_model: Union[str, None], selected_dataset: List[str], selected_stat: str):
+
+def update_data_and_chart(selected_model: Union[str, None], selected_dataset: List[str], selected_stat: str):
+    selected_dataset_id = None
+    for i in DUMMY_DATA:
+        label, value = i["label"], i["value"]
+        if value[0] == selected_dataset[0]:
+            selected_dataset_id = label
+
+    print(
+        f"Processing {Pipeline.pipe_id(selected_model, selected_dataset_id)}\nPlease wait...")
+    df = preprocess(selected_model, selected_dataset, selected_dataset_id, selected_stat)
+    # print("\ndf: ", df)
+    fig = px.bar(df, x="frequency", y="token")
+    return fig
+
 
 def run_server(model: str, dataset: List[str], dataset_id: Union[str, None]) -> None:
     app = JupyterDash(__name__)
@@ -33,7 +46,7 @@ def run_server(model: str, dataset: List[str], dataset_id: Union[str, None]) -> 
     add_dataset = True
     for i in DUMMY_DATA:
         label, value = i["label"], i["value"]
-        if value == dataset:
+        if value[0] == dataset[0]:
             dataset_id = label
             add_dataset = False
 
@@ -46,8 +59,14 @@ def run_server(model: str, dataset: List[str], dataset_id: Union[str, None]) -> 
     pipes.add_pipeline(input_pipe)
     pipes.run_pipelines()
 
-    FLAT_DUMMY = [{"label": dummy_data["label"], "value": " ".join(
-        dummy_data["value"])} for dummy_data in DUMMY_DATA]
+    # run_pipeline(model, dataset, tokenizer)
+    # html_head_view = get_bertviz()
+    # with open("codewit_semeru/codewit_semeru/frontend/assets/head_view.html", 'w') as file:
+    #     file.write(html_head_view.data)
+    # bertviz_html = parse_head_view()
+
+    FLAT_DUMMY = [{"label": dataset["label"], "value": ' '.join(
+        dataset["value"])} for dataset in DUMMY_DATA]
 
     app.layout = html.Div([
         html.Div(data_editor_components, className="dataEditor"),
@@ -60,22 +79,14 @@ def run_server(model: str, dataset: List[str], dataset_id: Union[str, None]) -> 
     # TODO: update so bar chart doesn't include input sequence in analyzed tokens! Only predicted tokens.
     # TODO: update so string representations of tokens are shown rather than tokens themselves
     @app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown_1", "value"), Input("desc_stats_1", "value"))
-    def update_bar_chart1(selected_dataset: Union[Dataset, str], selected_model: Union[str, None], selected_stat: str):
-        selected_dataset_id = None
-        for i in FLAT_DUMMY:
-            label, value = i["label"], i["value"]
-            if value == selected_dataset:
-                selected_dataset_id = label
+    def update_bar_graph1(selected_dataset: List[str], selected_model: Union[str, None], selected_stat: Union[str, None]):
+        return update_data_and_chart(tokenizer, selected_model if selected_model else model, selected_dataset if selected_dataset else dataset, selected_stat)
 
-        # print(f'{selected_dataset_id} {selected_dataset} {selected_model}')
-        df = preprocess(selected_model, selected_dataset,
-                        selected_dataset_id, selected_stat)
-        # print("\ndf: ", df)
-        fig = px.bar(df, x="frequency", y="token", labels={
-                     "frequency": str(selected_stat) + " token frequency"})
-        return fig
+    """ @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"))
+    def update_bar_graph2(selected_dataset: Union[str, None], selected_model: Union[str, None], selected_stat: Union[str, None]):
+        return update_data_and_chart(tokenizer, selected_model if selected_model else model, selected_dataset, selected_stat) """
 
-    # @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"))
+    # @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown2", "value"))
     # def update_bar_chart2(selected_dataset: Union[str, None], selected_model: Union[str, None]):
     #     selected_dataset_id = None
     #     for i in flattened_DUMMY:
@@ -90,4 +101,13 @@ def run_server(model: str, dataset: List[str], dataset_id: Union[str, None]) -> 
     #     fig = px.bar(df, x="frequency", y="token")
     #     return fig
 
+
+    # @app.callback(Output("bertviz", "children"), Input("dataset_dropdown", "value"))
+    # def update_bertviz(value):
+    #     attention, input_tkns = get_bertviz()
+    #     html_rep = head_view(attention, input_tkns, html_action='return')
+    #     return html_rep
+
+    # update_bar_chart(dataset if dataset else DUMMY_DATA[0])
+    # update_bertviz(1)
     app.run_server(mode="inline", debug=True)

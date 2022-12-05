@@ -31,17 +31,17 @@ def graph_settings_components(datasets, dataset, models, model):
         html.Div([
             html.Div([
                 "View:",
-                dcc.Dropdown(["single graph", "two graph comparison"], id="view_dropdown")]),
+                dcc.Dropdown(["single graph", "two graph comparison"], value="two graph comparison", id="view_dropdown")]),
             html.Div([
                 html.Div([
                     "Dataset:",
                     dcc.Dropdown(datasets, value=dataset,
                                  id="dataset_dropdown_1"),
                     "Model:",
-                    dcc.Dropdown(models, id="model_dropdown_1", value=model),
+                    dcc.Dropdown(models, value=model, id="model_dropdown_1"),
                     "Descriptive Stat:",
-                    dcc.Dropdown(["mean", "median",  "std dev", "mode",
-                                 "max", "min"], id="desc_stats_1", value="mean"),
+                    dcc.Dropdown(["mean", "median", "std dev", "mode",
+                                 "max", "min"], value="mean", id="desc_stats_1"),
                     "Num Tokens:",
                     dcc.Input(type="text", id="num_token_1"),
                     html.Br(),
@@ -55,8 +55,7 @@ def graph_settings_components(datasets, dataset, models, model):
                     className="graphSettingsFill"),
                 html.Div([
                     "Dataset:",
-                    dcc.Dropdown(["Option 1", "Option 2", "Option 3"],
-                                 id="dataset_dropdown_2"),
+                    dcc.Dropdown(datasets, id="dataset_dropdown_2"),
                     "Model:",
                     dcc.Dropdown(models, id="model_dropdown_2"),
                     "Num Tokens:",
@@ -86,13 +85,3 @@ graph_display_components = [
             dcc.Graph(id="graph2")],
             className="graphFill")],
         className="graph")]
-
-
-"""
-graph_settings_components = lambda models: [
-    "Dataset:",
-    dcc.Dropdown(["Option 1", "Option 2", "Option 3"], id="dataset_dropdown"),
-    "Model:",
-    dcc.Dropdown(models),
-]
-"""
