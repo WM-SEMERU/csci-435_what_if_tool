@@ -6,4 +6,4 @@ plotly
 typing
 jupyter-dash==0.4.2
 dash-dangerously-set-inner-html
-beautifulsoup4
+dotenv

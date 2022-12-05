@@ -41,7 +41,9 @@ class Pipeline:
         self.completed: bool = False
 
     def query_model(self, payload: str):
+        print(payload)
         if self.model == "Salesforce/codegen-350M-mono":
+            # for i in range(len(payload)):
             data = {"inputs": payload}
         else:
             data = json.dumps(payload)
@@ -55,7 +57,7 @@ class Pipeline:
         # Weird interaction here where specifiying transformers generate pipeline + getting attention does not quite work...
         # to-do : figure out how to extract all necessary info from one pipeline run
         data = self.query_model(self.dataset)
-
+        print(data)
         output_strs = list(map(lambda res: res[0]["generated_text"], data))
         output_tkns = list(map(self.tokenizer.tokenize, output_strs))
 
