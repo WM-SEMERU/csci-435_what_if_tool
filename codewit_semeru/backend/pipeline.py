@@ -10,18 +10,18 @@ class Pipeline:
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     @staticmethod
-    def pipe_id(tokenizer: str, model: str, dataset_id: str) -> str:
+    def pipe_id(model: str, dataset_id: str) -> str:
         if dataset_id == None:
             dataset_id = str(uuid4())
-        return "<>".join([tokenizer, model, dataset_id])
+        return "<>".join([model, dataset_id])
 
-    def __init__(self, tokenizer: str, model: str, dataset: List[str], dataset_id: str = None) -> None:
+    def __init__(self, model: str, dataset: List[str], dataset_id: str = None) -> None:
         if dataset_id == None:
             dataset_id = str(uuid4())
-        self.id: str = Pipeline.pipe_id(tokenizer, model, dataset_id)
+        self.id: str = Pipeline.pipe_id(model, dataset_id)
         print(self.id)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+        self.tokenizer = AutoTokenizer.from_pretrained(model)
         self.model = AutoModelForCausalLM.from_pretrained(
             model, output_attentions=True).to(self.device)
         self.dataset: List[str] = dataset

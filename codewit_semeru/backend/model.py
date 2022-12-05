@@ -8,15 +8,12 @@ from .pipeline_store import PipelineStore
 pipes = PipelineStore()
 
 
-def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str, stat: str = "mean") -> List[str]:
-    pipe_id = Pipeline.pipe_id(tokenizer, model, dataset_id)
-    pipe = pipes.get_pipeline(pipe_id)
-    print("pipeid: ", pipe_id)
-
+def preprocess(model: str, dataset: str, dataset_id: str, stat: str = "mean") -> List[str]:
+    pipe = pipes.get_pipeline(Pipeline.pipe_id(model, dataset_id))
     if not pipe:
-        pipe = Pipeline(tokenizer, model, dataset, dataset_id)
+        pipe = Pipeline(model, dataset, dataset_id)
         pipes.add_pipeline(pipe)
-        pipes.run_pipe(pipe_id)
+        pipes.run_pipe(pipe.id)
 
     if stat == "mean":
         stats_func = statistics.mean
