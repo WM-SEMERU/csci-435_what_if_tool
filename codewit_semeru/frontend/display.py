@@ -16,7 +16,7 @@ DUMMY_DATA = [{"label": str(uuid4()), "value": ["This is some chunk of code that
               {"label": str(uuid4()), "value": ["def foo(bar): print(bar) foo(123)"]}]
 
 models = ["gpt2", "codeparrot/codeparrot-small",
-          "codegen", "gpt-neo"]  # add codebert, neox?
+          "Salesforce/codegen-350M-mono", "EleutherAI/gpt-neo-125M"]  # add codebert, neox?
 
 pipes = PipelineStore()
 

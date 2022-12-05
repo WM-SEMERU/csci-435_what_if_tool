@@ -43,17 +43,21 @@ class Pipeline:
     def run(self) -> None:
         # Weird interaction here where specifiying transformers generate pipeline + getting attention does not quite work...
         # to-do : figure out how to extract all necessary info from one pipeline run
-        def query(payload):
-            data = json.dumps(payload)
+        def query(payload, model):
+            if model == 'Salesforce/codegen-350M-mono':
+                data = {"inputs": payload}
+            else:
+                data = json.dumps(payload)
             response = requests.request("POST", self.API_URL, headers=self.headers, data=data)
             return json.loads(response.content.decode("utf-8"))
 
         for i in range(len(self.dataset)):
 
-            data = query(self.dataset[i])
+            data = query(self.dataset[i], self.model)
+            
+            # if self.model == "codeparrot/codeparrot-small" or self.model == "gpt2":
             self.output_strs.append([data[0]['generated_text']])
-            if self.model == "codeparrot/codeparrot-small":
-                self.output_tkns.append(self.tokenizer.tokenize(self.output_strs[i][0]))
+            self.output_tkns.append(self.tokenizer.tokenize(self.output_strs[i][0]))
             # self.output_tkns.append(self.tokenizer.tokenize(self.output_strs[i]))
             print(data[0])
         print(f'Output tkns: {self.output_tkns}')         
