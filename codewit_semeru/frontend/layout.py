@@ -29,7 +29,8 @@ data_editor_components = [
     ], className="dataField"),
     html.Div(["Predictions:", html.Br(), "[Insert table here]"], className="dataOutput")]
 
-def graph_settings_components (datasets, dataset, models, model):
+
+def graph_settings_components(datasets, dataset, models, model):
     return [
         html.Div([
             html.Div([
@@ -38,7 +39,8 @@ def graph_settings_components (datasets, dataset, models, model):
             html.Div([
                 html.Div([
                     "Dataset:",
-                    dcc.Dropdown(datasets, value = dataset, id="dataset_dropdown_1"),
+                    dcc.Dropdown(datasets, value=dataset,
+                                 id="dataset_dropdown_1"),
                     "Model:",
                     dcc.Dropdown(models, value=model, id="model_dropdown_1"),
                     "Descriptive Stat:",
@@ -70,8 +72,9 @@ def graph_settings_components (datasets, dataset, models, model):
                     dcc.Dropdown(graph_types, id="graph_type_2")
                 ],
                     className="graphSettingsFill")])
-            ], className="graphSettings")
-        ]
+        ], className="graphSettings")
+    ]
+
 
 graph_display_components = [
     html.Div([
@@ -82,4 +85,3 @@ graph_display_components = [
             dcc.Graph(id="graph2")],
             className="graphFill")],
         className="graph")]
-            
