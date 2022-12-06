@@ -1,9 +1,20 @@
+import sys
+import os
+import json
+import requests
 from collections import Counter, defaultdict
+from dotenv import load_dotenv
 from typing import List
 from uuid import uuid4
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch, os, json, requests
-from .config import config
+from transformers import AutoTokenizer
+import torch
+
+path = f"{sys.path[0]}/codewit_semeru/backend/config/.env"
+load_dotenv(path)
+
+HF_API_KEY = os.getenv("HF_API_TOKEN")
+headers = {"Authorization": f"Bearer {HF_API_KEY}"}
+
 
 class Pipeline:
     # to-do https://github.com/tensorflow/tensorflow/issues/53529
@@ -16,52 +27,51 @@ class Pipeline:
         return "<>".join([model, dataset_id])
 
     def __init__(self, model: str, dataset: List[str], dataset_id: str = None) -> None:
-        self.HF_API_KEY = config.HF_API_TOKEN
-
-        self.API_URL = f"https://api-inference.huggingface.co/models/{model}"
-        self.headers = {"Authorization": f"Bearer {self.HF_API_KEY}"}
-
         if dataset_id == None:
             dataset_id = str(uuid4())
         self.id: str = Pipeline.pipe_id(model, dataset_id)
-        print(self.id)
 
         self.tokenizer = AutoTokenizer.from_pretrained(model)
         self.model = model
         self.dataset: List[str] = dataset
         self.dataset_id = dataset_id
 
+        self.api_url = f"https://api-inference.huggingface.co/models/{self.model}"
+
         self.output = []
-        
+
         self.output_strs: List[str] = []
         self.output_tkns: List[str] = []
         self.output_tok_freqs = defaultdict(list)
 
         self.completed: bool = False
 
+    def query_model(self, payload: str):
+        if self.model == "Salesforce/codegen-350M-mono":
+            data = {"inputs": payload}
+        else:
+            data = json.dumps(payload)
+        response = requests.request(
+            "POST", self.api_url, headers=headers, data=data)
+        return json.loads(response.content.decode("utf-8"))
 
     # TODO: Update so output doesn't contain input sequence!
+
     def run(self) -> None:
         # Weird interaction here where specifiying transformers generate pipeline + getting attention does not quite work...
         # to-do : figure out how to extract all necessary info from one pipeline run
-        def query(payload, model):
-            if model == 'Salesforce/codegen-350M-mono':
-                data = {"inputs": payload}
-            else:
-                data = json.dumps(payload)
-            response = requests.request("POST", self.API_URL, headers=self.headers, data=data)
-            return json.loads(response.content.decode("utf-8"))
-
         for i in range(len(self.dataset)):
+            data = self.query_model(self.dataset[i])
+            print(data)
 
-            data = query(self.dataset[i], self.model)
-            
             # if self.model == "codeparrot/codeparrot-small" or self.model == "gpt2":
-            self.output_strs.append([data[0]['generated_text']])
-            self.output_tkns.append(self.tokenizer.tokenize(self.output_strs[i][0]))
+            self.output_strs.append([data[0]["generated_text"]])
+            self.output_tkns.append(
+                self.tokenizer.tokenize(self.output_strs[i][0]))
             # self.output_tkns.append(self.tokenizer.tokenize(self.output_strs[i]))
             print(data[0])
-        print(f'Output tkns: {self.output_tkns}')         
+
+        print(f"Output tkns: {self.output_tkns}")
 
         for tokens in self.output_tkns:
             counts = Counter(tokens)
@@ -76,5 +86,3 @@ class Pipeline:
         self.completed = True
         print("output_strs: ", self.output_strs)
         print(f"Pipeline completed for pipe {self.id}")
-    
-    
