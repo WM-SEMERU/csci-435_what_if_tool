@@ -2,8 +2,8 @@ from collections import Counter, defaultdict
 from typing import List
 from uuid import uuid4
 from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-
+import torch, os, json, requests
+from .config import config
 
 class Pipeline:
     # to-do https://github.com/tensorflow/tensorflow/issues/53529
@@ -16,45 +16,47 @@ class Pipeline:
         return "<>".join([model, dataset_id])
 
     def __init__(self, model: str, dataset: List[str], dataset_id: str = None) -> None:
+        self.HF_API_KEY = config.HF_API_TOKEN
+
+        self.API_URL = f"https://api-inference.huggingface.co/models/{model}"
+        self.headers = {"Authorization": f"Bearer {self.HF_API_KEY}"}
+
         if dataset_id == None:
             dataset_id = str(uuid4())
         self.id: str = Pipeline.pipe_id(model, dataset_id)
 
         self.tokenizer = AutoTokenizer.from_pretrained(model)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model, output_attentions=True).to(self.device)
+        self.model = model
         self.dataset: List[str] = dataset
         self.dataset_id = dataset_id
 
         self.output = []
-        self.test_output = []
+        
         self.output_strs: List[str] = []
         self.output_tkns: List[str] = []
         self.output_tok_freqs = defaultdict(list)
 
         self.completed: bool = False
 
-        self.model.config.pad_token_id = self.model.config.eos_token_id
-        self.input_ids = []
-        self.input_tkns = []
-        for i in range(len(dataset)):
-            self.input_ids.append(self.tokenizer(
-                dataset[i], return_tensors="pt").input_ids.to(self.device))
-            self.input_tkns.append(self.tokenizer.convert_ids_to_tokens(
-                self.input_ids[i][0]))
 
     # TODO: Update so output doesn't contain input sequence!
     def run(self) -> None:
         # Weird interaction here where specifiying transformers generate pipeline + getting attention does not quite work...
         # to-do : figure out how to extract all necessary info from one pipeline run
+        def query(payload):
+            data = json.dumps(payload)
+            response = requests.request("POST", self.API_URL, headers=self.headers, data=data)
+            return json.loads(response.content.decode("utf-8"))
+
         for i in range(len(self.dataset)):
-            self.output.append(self.model.generate(
-                self.input_ids[i], do_sample=False, max_new_tokens=50))
-            self.test_output.append(self.model(self.input_ids[i]))
-            self.output_strs.append(self.tokenizer.batch_decode(
-                self.output[i], skip_special_tokens=True))
-            self.output_tkns.append(
-                self.tokenizer.tokenize(self.output_strs[i][0]))
+
+            data = query(self.dataset[i])
+            self.output_strs.append([data[0]['generated_text']])
+            if self.model == "codeparrot/codeparrot-small":
+                self.output_tkns.append(self.tokenizer.tokenize(self.output_strs[i][0]))
+            # self.output_tkns.append(self.tokenizer.tokenize(self.output_strs[i]))
+            print(data[0])
+        print(f'Output tkns: {self.output_tkns}')         
 
         for tokens in self.output_tkns:
             counts = Counter(tokens)
@@ -69,3 +71,5 @@ class Pipeline:
         self.completed = True
         print("output_strs: ", self.output_strs)
         print(f"Pipeline completed for pipe {self.id}")
+    
+    
