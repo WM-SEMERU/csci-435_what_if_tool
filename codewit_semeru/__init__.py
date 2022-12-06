@@ -13,5 +13,5 @@ from typing import List
 from .frontend.display import run_server
 
 
-def WITCode(model: str = "gpt2", dataset: List[str] = []) -> None:
-    run_server(model, dataset)
+def WITCode(model: str = "gpt2", dataset: List[str] = [], dataset_id: str = None) -> None:
+    run_server(model, dataset, dataset_id)
