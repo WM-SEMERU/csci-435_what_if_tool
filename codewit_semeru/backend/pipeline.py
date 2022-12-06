@@ -2,10 +2,10 @@ import sys
 import os
 import json
 import requests
+import time
 from collections import Counter, defaultdict
 from dotenv import load_dotenv
 from typing import List
-from uuid import uuid4
 from transformers import AutoTokenizer
 import torch
 
@@ -24,15 +24,14 @@ class Pipeline:
     def pipe_id(model: str, dataset_id: str) -> str:
         return "<>".join([model, dataset_id])
 
-    def __init__(self, model: str, dataset: List[str], dataset_id: str = None) -> None:
-        if dataset_id == None:
-            dataset_id = str(uuid4())
+    def __init__(self, model: str, dataset: List[str], dataset_id: str = "") -> None:
+        self.model: str = model
+        self.dataset: List[str] = dataset
+        self.dataset_id: str = dataset_id
+
         self.id: str = Pipeline.pipe_id(model, dataset_id)
 
         self.tokenizer = AutoTokenizer.from_pretrained(model)
-        self.model = model
-        self.dataset: List[str] = dataset
-        self.dataset_id = dataset_id
 
         self.api_url = f"https://api-inference.huggingface.co/models/{self.model}"
 
@@ -40,11 +39,11 @@ class Pipeline:
 
         self.completed: bool = False
 
-    def query_model(self, payload: str):
+    def query_model(self):
         if self.model == "Salesforce/codegen-350M-mono":
-            data = {"inputs": payload}
+            data = {"inputs": self.dataset}
         else:
-            data = json.dumps(payload)
+            data = json.dumps(self.dataset)
         response = requests.request(
             "POST", self.api_url, headers=headers, data=data)
         return json.loads(response.content.decode("utf-8"))
@@ -52,19 +51,22 @@ class Pipeline:
     # TODO: Update so output doesn't contain input sequence!
 
     def run(self) -> None:
-        # Weird interaction here where specifiying transformers generate pipeline + getting attention does not quite work...
-        # to-do : figure out how to extract all necessary info from one pipeline run
-        data = self.query_model(self.dataset)
+        res = self.query_model()
+        if type(res) is dict and res["error"]:
+            print("error: ", res["error"], "\nRetrying in ", res["estimated_time"], "seconds")
+            time.sleep(res["estimated_time"])
+            print("Retrying...")
+            res = self.query_model()
 
-        output_strs = list(map(lambda res: res[0]["generated_text"], data))
-        output_tkns = list(map(self.tokenizer.tokenize, output_strs))
+        output_strs = [data[0]["generated_text"] for data in res]
+        output_tkns = [self.tokenizer.tokenize(strs) for strs in output_strs]
 
         for tkns in output_tkns:
             cts = Counter(tkns)
             for tkn in cts:
                 self.output_tok_freqs[tkn].append(cts[tkn])
 
-        # Add 0 freq counts for tokens which were not within all predicted sequences
+        # add 0 freq counts for tokens which were not within all predicted sequences
         for tkn in self.output_tok_freqs:
             seq_diff = len(output_tkns) - len(self.output_tok_freqs[tkn])
             self.output_tok_freqs[tkn].extend([0] * seq_diff)                
