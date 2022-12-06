@@ -1,4 +1,4 @@
-from typing import List, TypedDict, Union
+from typing import List, Union
 from uuid import uuid4
 from jupyter_dash import JupyterDash
 import plotly.express as px
@@ -80,7 +80,6 @@ def run_server(model: str, dataset: List[str], dataset_id: Union[str, None]) -> 
     # TODO: update so string representations of tokens are shown rather than tokens themselves
     @app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown_1", "value"), Input("desc_stats_1", "value"))
     def update_bar_graph1(selected_dataset: List[str], selected_model: Union[str, None], selected_stat: Union[str, None]):
-        print(selected_dataset if selected_dataset else dataset)
         return update_data_and_chart(FLAT_DUMMY, selected_model if selected_model else model, selected_dataset if selected_dataset else dataset, selected_stat)
 
     """ @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"))
