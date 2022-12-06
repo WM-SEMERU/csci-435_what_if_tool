@@ -1,6 +1,7 @@
 from typing import List, Union
 from uuid import uuid4
 from jupyter_dash import JupyterDash
+from matplotlib.figure import Figure
 import plotly.express as px
 from dash import dcc, html, Input, Output
 
@@ -20,70 +21,60 @@ models = ["gpt2", "codeparrot/codeparrot-small",
 
 pipes = PipelineStore()
 
-# TODO: convert to class to reduce redundancy of parameters
 
+class CodeWITServer():
+    def __init__(self, model: str, dataset: List[str], dataset_id: Union[str, None]):
+        self.app = JupyterDash(__name__)
 
-def update_data_and_chart(FLAT_DUMMY, selected_model: str, selected_dataset: str, selected_stat: str):
-    # ? #60 - can this be done another way given dataset dropdown vs. input?
-    selected_dataset_id = None
-    for i in FLAT_DUMMY:
-        label, value = i["label"], i["value"]
-        if value == selected_dataset:
-            selected_dataset_id = label
+        self.model = model
+        self.dataset = dataset
 
-    for i in DUMMY_DATA:
-        label, value = i["label"], i["value"]
-        if label == selected_dataset_id:
-            selected_dataset = value
+        dataset_id = next((d["label"] for d in DUMMY_DATA if d["value"][0] == dataset[0]), None)
+        if not dataset_id:
+            dataset_id = str(uuid4())
+            DUMMY_DATA.append({"label": dataset_id, "value": dataset})
 
-    print(
-        f"Processing {Pipeline.pipe_id(selected_model, selected_dataset_id)}\nPlease wait...")
-    df = preprocess(selected_model, selected_dataset,
-                    selected_dataset_id, selected_stat)
-    # print("\ndf: ", df)
-    fig = px.bar(df, x="frequency", y="token")
-    return fig
+        input_pipe = Pipeline(model, dataset, dataset_id)
+        pipes.add_pipeline(input_pipe)
+        pipes.run_pipelines()
 
+        self.FLAT_DUMMY = [{"label": dataset["label"], "value": " ".join(
+            dataset["value"])} for dataset in DUMMY_DATA]
 
-def run_server(model: str, dataset: List[str], dataset_id: Union[str, None]) -> None:
-    app = JupyterDash(__name__)
+        self.app.layout = html.Div([
+            html.Div(data_editor_components, className="dataEditor"),
+            html.Div(graph_settings_components(
+                self.FLAT_DUMMY, " ".join(dataset), models, model), className="graphSettings"),
+            html.Div([dcc.Graph(id="graph1"), dcc.Graph(
+                id="graph2")], className="graph")
+        ])
 
-    # TODO: refactor for efficiency
-    add_dataset = True
-    for i in DUMMY_DATA:
-        label, value = i["label"], i["value"]
-        if value[0] == dataset[0]:
-            dataset_id = label
-            add_dataset = False
+    def update_data_and_chart(self, selected_model: str, selected_dataset: str, selected_stat: str) -> Figure:
+        # ? #60 - can this be done another way given dataset dropdown vs. input?
+        dataset_id = next((d["label"] for d in self.FLAT_DUMMY if d["value"] == selected_dataset), None)
+        selected_dataset_id = dataset_id if dataset_id else None
 
-    if add_dataset:
-        dataset_id = str(uuid4())
-        DUMMY_DATA.append({"label": dataset_id, "value": dataset})
+        dataset = next((d["value"] for d in DUMMY_DATA if d["label"] == selected_dataset_id), None)
+        selected_dataset = dataset if dataset else None
 
-    # TODO: don't create new pipeline if identical one already exists!
-    input_pipe = Pipeline(model, dataset, dataset_id)
-    pipes.add_pipeline(input_pipe)
-    pipes.run_pipelines()
+        print(
+            f"Processing {Pipeline.pipe_id(selected_model, selected_dataset_id)}\nPlease wait...")
+        df = preprocess(selected_model, selected_dataset,
+                        selected_dataset_id, selected_stat)
+        # print("\ndf: ", df)
+        fig = px.bar(df, x="frequency", y="token")
+        return fig
 
-    FLAT_DUMMY = [{"label": dataset["label"], "value": " ".join(
-        dataset["value"])} for dataset in DUMMY_DATA]
+    def run(self) -> None:
+        # TODO: update so bar chart doesn't include input sequence in analyzed tokens! Only predicted tokens.
+        # TODO: update so string representations of tokens are shown rather than tokens themselves
+        @self.app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown_1", "value"), Input("desc_stats_1", "value"))
+        def update_bar_graph1(selected_dataset: List[str], selected_model: Union[str, None], selected_stat: Union[str, None]):
+            return self.update_data_and_chart(selected_model if selected_model else self.model, selected_dataset if selected_dataset else self.dataset, selected_stat)
 
-    app.layout = html.Div([
-        html.Div(data_editor_components, className="dataEditor"),
-        html.Div(graph_settings_components(
-            FLAT_DUMMY, " ".join(dataset), models, model), className="graphSettings"),
-        html.Div([dcc.Graph(id="graph1"), dcc.Graph(
-            id="graph2")], className="graph")
-    ])
+        """ @self.app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"))
+        def update_bar_graph2(selected_dataset: Union[str, None], selected_model: Union[str, None], selected_stat: Union[str, None]):
+            return update_data_and_chart(selected_model if selected_model else self.model, selected_dataset if selected_dataset else self.dataset, selected_stat) """
 
-    # TODO: update so bar chart doesn't include input sequence in analyzed tokens! Only predicted tokens.
-    # TODO: update so string representations of tokens are shown rather than tokens themselves
-    @app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown_1", "value"), Input("desc_stats_1", "value"))
-    def update_bar_graph1(selected_dataset: List[str], selected_model: Union[str, None], selected_stat: Union[str, None]):
-        return update_data_and_chart(FLAT_DUMMY, selected_model if selected_model else model, selected_dataset if selected_dataset else dataset, selected_stat)
+        self.app.run_server(mode="inline", debug=True)
 
-    """ @app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"))
-    def update_bar_graph2(selected_dataset: Union[str, None], selected_model: Union[str, None], selected_stat: Union[str, None]):
-        return update_data_and_chart(selected_model if selected_model else model, selected_dataset if selected_dataset else dataset, selected_stat) """
-
-    app.run_server(mode="inline", debug=True)
