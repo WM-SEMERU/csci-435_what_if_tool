@@ -22,8 +22,6 @@ class Pipeline:
 
     @staticmethod
     def pipe_id(model: str, dataset_id: str) -> str:
-        if dataset_id == None:
-            dataset_id = str(uuid4())
         return "<>".join([model, dataset_id])
 
     def __init__(self, model: str, dataset: List[str], dataset_id: str = None) -> None:
@@ -38,10 +36,6 @@ class Pipeline:
 
         self.api_url = f"https://api-inference.huggingface.co/models/{self.model}"
 
-        self.output = []
-
-        self.output_strs: List[str] = []
-        self.output_tkns: List[str] = []
         self.output_tok_freqs = defaultdict(list)
 
         self.completed: bool = False
@@ -60,29 +54,20 @@ class Pipeline:
     def run(self) -> None:
         # Weird interaction here where specifiying transformers generate pipeline + getting attention does not quite work...
         # to-do : figure out how to extract all necessary info from one pipeline run
-        for i in range(len(self.dataset)):
-            data = self.query_model(self.dataset[i])
-            print(data)
+        data = self.query_model(self.dataset)
 
-            # if self.model == "codeparrot/codeparrot-small" or self.model == "gpt2":
-            self.output_strs.append([data[0]["generated_text"]])
-            self.output_tkns.append(
-                self.tokenizer.tokenize(self.output_strs[i][0]))
-            # self.output_tkns.append(self.tokenizer.tokenize(self.output_strs[i]))
-            print(data[0])
+        output_strs = list(map(lambda res: res[0]["generated_text"], data))
+        output_tkns = list(map(self.tokenizer.tokenize, output_strs))
 
-        print(f"Output tkns: {self.output_tkns}")
-
-        for tokens in self.output_tkns:
-            counts = Counter(tokens)
-            for token in counts:
-                self.output_tok_freqs[token].append(counts[token])
+        for tkns in output_tkns:
+            cts = Counter(tkns)
+            for tkn in cts:
+                self.output_tok_freqs[tkn].append(cts[tkn])
 
         # Add 0 freq counts for tokens which were not within all predicted sequences
-        for token in self.output_tok_freqs:
-            for _ in range(len(self.output_tkns) - len(self.output_tok_freqs[token])):
-                self.output_tok_freqs[token].append(0)
-
+        for tkn in self.output_tok_freqs:
+            seq_diff = len(output_tkns) - len(self.output_tok_freqs[tkn])
+            self.output_tok_freqs[tkn].extend([0] * seq_diff)                
+        
         self.completed = True
-        print("output_strs: ", self.output_strs)
         print(f"Pipeline completed for pipe {self.id}")
