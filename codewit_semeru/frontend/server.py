@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List
 from uuid import uuid4
 from jupyter_dash import JupyterDash
 from matplotlib.figure import Figure
@@ -27,7 +27,7 @@ class CodeWITServer():
         self.app = JupyterDash(__name__)
 
         self.model_1 = model
-        self.dataset_1 = dataset
+        self.dataset_1 = dataset if dataset else DUMMY_DATA[0]["value"]
         
         self.model_2, self.dataset_2 = "", []
 
@@ -67,7 +67,6 @@ class CodeWITServer():
 
         df = preprocess(selected_model, selected_dataset,
                         selected_dataset_id, selected_stat)
-
         print("Done!")
         
         fig = px.bar(df, x="frequency", y="token")
@@ -82,10 +81,16 @@ class CodeWITServer():
                 return self.update_data_and_chart(selected_model, selected_dataset, selected_stat)
             except LookupError:
                 print("error: dataset not found!")
+                return px.bar()
 
-        """ @self.app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"))
-        def update_bar_graph2(selected_dataset: Union[str, None], selected_model: Union[str, None], selected_stat: Union[str, None]):
-            return update_data_and_chart(selected_model if selected_model else self.model, selected_dataset if selected_dataset else self.dataset, selected_stat) """
+        @self.app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"))
+        def update_bar_graph2(selected_dataset: List[str] = self.dataset_2, selected_model: str = self.model_2, selected_stat: str = "mean"):
+            if selected_dataset and selected_model:
+                try:
+                    return self.update_data_and_chart(selected_model, selected_dataset, selected_stat)
+                except LookupError:
+                    print("error: dataset not found!")
+            return px.bar()
 
         self.app.run_server(mode="inline", debug=True)
 

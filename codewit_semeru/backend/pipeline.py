@@ -52,7 +52,7 @@ class Pipeline:
 
     def run(self) -> None:
         res = self.query_model()
-        if type(res) is dict and res["error"]:
+        while type(res) is dict and res["error"]:
             print("error: ", res["error"], "\nRetrying in ", res["estimated_time"], "seconds")
             time.sleep(res["estimated_time"])
             print("Retrying...")
