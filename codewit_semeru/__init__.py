@@ -10,8 +10,10 @@ __credits__ = 'College of William & Mary'
 
 
 from typing import List
-from .frontend.display import run_server
+from .frontend.display import CodeWITServer
 
 
 def WITCode(model: str = "gpt2", dataset: List[str] = [], dataset_id: str = None) -> None:
-    run_server(model, dataset, dataset_id)
+    server = CodeWITServer(model, dataset, dataset_id)
+    server.run()
+    # run_server(model, dataset, dataset_id)
