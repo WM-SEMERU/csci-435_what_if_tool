@@ -42,7 +42,7 @@ class CodeWITServer():
             dataset["value"])} for dataset in DUMMY_DATA]
 
         self.app.layout = html.Div([
-            html.Div(data_editor_components, className="dataEditor"),
+            #html.Div(data_editor_components, className="dataEditor"),
             html.Div(graph_settings_components(
                 self.FLAT_DUMMY, " ".join(dataset), models, model), className="graphSettings"),
             html.Div([dcc.Graph(id="graph1"), dcc.Graph(
