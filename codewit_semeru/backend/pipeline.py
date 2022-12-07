@@ -78,7 +78,7 @@ class Pipeline:
             self.output_tok_freqs[tkn].extend([0] * seq_diff)                
         # print("output_tok_freqs2: ", self.output_tok_freqs)
 
-        print("output_strs: ",output_strs)
+        print("output_seqs: ",output_seqs)
 
         self.completed = True
         print(f"Pipeline completed for pipe {self.id}")
