@@ -42,7 +42,8 @@ class Pipeline:
         self.completed: bool = False
 
     def query_model(self):
-        data = json.dumps({"inputs": self.dataset})
+        print("Querying HF API, this will take a moment...")
+        data = json.dumps({"inputs": self.dataset, "parameters": {"return_full_text": False, "max_new_tokens": 50, "max_time": 30}})
         response = requests.request(
             "POST", self.api_url, headers=headers, data=data)
         return json.loads(response.content.decode("utf-8"))
@@ -76,3 +77,4 @@ class Pipeline:
         
         self.completed = True
         print(f"Pipeline completed for pipe {self.id}")
+        print(output_tkns)

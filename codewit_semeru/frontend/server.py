@@ -1,14 +1,14 @@
 from typing import List
 from uuid import uuid4
 from jupyter_dash import JupyterDash
-from matplotlib.figure import Figure
+from plotly.graph_objs._figure import Figure
 import plotly.express as px
 from dash import dcc, html, Input, Output
 
 from ..backend.model import preprocess
 from ..backend.pipeline import Pipeline
 from ..backend.pipeline_store import PipelineStore
-from .layout import data_editor_components, graph_settings_components
+from .layout import graph_settings_components
 
 
 DUMMY_DATA = [{"label": str(uuid4()), "value": ["This is some chunk of code that I wish to analyze"]},
@@ -51,7 +51,7 @@ class CodeWITServer():
                 id="graph2")], className="graph")
         ])
 
-    def update_data_and_chart(self, selected_model: str, selected_dataset: str, selected_stat: str) -> Figure:
+    def update_data_and_chart(self, selected_model: str, selected_dataset: List[str], selected_stat: str) -> Figure:
         # ? #60 - can this be done another way given dataset dropdown vs. input?
         dataset_id = next((d["label"] for d in self.FLAT_DUMMY if d["value"] == selected_dataset), "")
         selected_dataset_id = dataset_id if dataset_id else ""
