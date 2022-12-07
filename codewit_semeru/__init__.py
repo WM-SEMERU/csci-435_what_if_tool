@@ -5,8 +5,8 @@ What-if-tool Code. A Visual Tool for Understanding Machine Learning Models for S
 """
 
 __version__ = "0.0.4"
-__author__ = 'WM-SEMERU'
-__credits__ = 'College of William & Mary'
+__author__ = "WM-SEMERU"
+__credits__ = "College of William & Mary"
 
 
 from typing import List

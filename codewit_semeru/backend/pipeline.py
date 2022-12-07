@@ -48,7 +48,6 @@ class Pipeline:
             "POST", self.api_url, headers=headers, data=data)
         return json.loads(response.content.decode("utf-8"))
 
-    # TODO: Update so output doesn't contain input sequence!
 
     def run(self) -> None:
         res = self.query_model()
@@ -77,4 +76,3 @@ class Pipeline:
         
         self.completed = True
         print(f"Pipeline completed for pipe {self.id}")
-        print(output_tkns)
