@@ -23,7 +23,7 @@ def stats_func(stat: str):
     else:
         raise ValueError
 
-def preprocess(model: str, dataset: str, dataset_id: str, stat: str = "mean") -> List[str]:
+def preprocess(model: str, dataset: List[str], dataset_id: str, stat: str = "mean") -> pd.DataFrame:
     pipe = pipes.get_pipeline(Pipeline.pipe_id(model, dataset_id))
     if not pipe:
         pipe = Pipeline(model, dataset, dataset_id)
@@ -42,4 +42,4 @@ def preprocess(model: str, dataset: str, dataset_id: str, stat: str = "mean") ->
 
     except ValueError:
         print("Supported statistics are mean, median, std dev, mode, max, and min. Please use one of them.")
-        return []
+        return pd.DataFrame()

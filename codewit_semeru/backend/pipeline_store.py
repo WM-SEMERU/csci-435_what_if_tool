@@ -29,7 +29,7 @@ class PipelineStore(object):
             if not pipe.completed:
                 pipe.run()
 
-    def run_pipe(self, id: int) -> None:
+    def run_pipe(self, id: str) -> None:
         if id not in self.pipelines:
             raise Exception("rerun: pipeline not in store")
         self.pipelines[id].run()
