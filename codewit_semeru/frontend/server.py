@@ -61,7 +61,7 @@ class CodeWITServer():
 
         if not selected_dataset:
             raise LookupError
-
+            
         print(
             f"Processing {Pipeline.pipe_id(selected_model, selected_dataset_id)}\nPlease wait...")
 
@@ -69,7 +69,7 @@ class CodeWITServer():
                         selected_dataset_id, selected_stat)
         print("Done!")
         
-        fig = px.bar(df, x="frequency", y="token", labels={'frequency': str(selected_stat) + " token frequency"})
+        fig = px.bar(df, x="frequency", y="token", labels={'frequency': str(selected_stat) + " token frequency for model " + str(selected_model)})
         return fig
 
     def run(self) -> None:

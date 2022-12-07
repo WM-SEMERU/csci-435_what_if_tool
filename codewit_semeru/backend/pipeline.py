@@ -58,6 +58,7 @@ class Pipeline:
             print("Retrying...")
             res = self.query_model()
 
+        # print(res)
         output_strs = [data[0]["generated_text"] for data in res]
         output_tkns = [self.tokenizer.tokenize(strs) for strs in output_strs]
 
@@ -65,11 +66,16 @@ class Pipeline:
             cts = Counter(tkns)
             for tkn in cts:
                 self.output_tok_freqs[tkn].append(cts[tkn])
+        # print("output_tok_freqs1: ", self.output_tok_freqs)
+
 
         # add 0 freq counts for tokens which were not within all predicted sequences
         for tkn in self.output_tok_freqs:
             seq_diff = len(output_tkns) - len(self.output_tok_freqs[tkn])
             self.output_tok_freqs[tkn].extend([0] * seq_diff)                
-        
+        # print("output_tok_freqs2: ", self.output_tok_freqs)
+
+        print("output_strs: ",output_strs)
+
         self.completed = True
         print(f"Pipeline completed for pipe {self.id}")
