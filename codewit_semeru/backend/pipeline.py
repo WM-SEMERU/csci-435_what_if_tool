@@ -13,6 +13,8 @@ path = f"{sys.path[0]}/codewit_semeru/backend/config/.env"
 load_dotenv(path)
 
 HF_API_KEY = os.getenv("HF_API_TOKEN")
+assert HF_API_KEY is not None
+
 headers = {"Authorization": f"Bearer {HF_API_KEY}"}
 
 
@@ -40,10 +42,7 @@ class Pipeline:
         self.completed: bool = False
 
     def query_model(self):
-        if self.model == "Salesforce/codegen-350M-mono":
-            data = {"inputs": self.dataset}
-        else:
-            data = json.dumps(self.dataset)
+        data = json.dumps({"inputs": self.dataset})
         response = requests.request(
             "POST", self.api_url, headers=headers, data=data)
         return json.loads(response.content.decode("utf-8"))
@@ -53,13 +52,17 @@ class Pipeline:
     def run(self) -> None:
         res = self.query_model()
         while type(res) is dict and res["error"]:
-            print("error: ", res["error"], "\nRetrying in ", res["estimated_time"], "seconds")
+            print("error: ", res["error"])
+            if "estimated_time" not in res:
+                raise RuntimeError("pipeline run")
+            
+            print("Retrying in ", res["estimated_time"], "seconds")
             time.sleep(res["estimated_time"])
             print("Retrying...")
             res = self.query_model()
 
-        output_strs = [data[0]["generated_text"] for data in res]
-        output_tkns = [self.tokenizer.tokenize(strs) for strs in output_strs]
+        output_seqs = [data[0]["generated_text"] for data in res]
+        output_tkns = [self.tokenizer.tokenize(seq) for seq in output_seqs]
 
         for tkns in output_tkns:
             cts = Counter(tkns)
