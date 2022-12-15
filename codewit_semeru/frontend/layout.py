@@ -5,7 +5,7 @@ filler = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dictu
 
 desc_stats = ["mean", "median", "std dev", "mode", "max", "min"]
 
-graph_types = ["basic_token_hist", "token_dist_graph"]
+graph_types = [{"label": "Basic Token Histogram", "value": "basic_token_hist"}, {"label": "Token Distribution Graph", "value": "token_dist_graph"}]
 
 data_editor_components = [
     html.P(
@@ -35,11 +35,11 @@ def graph_settings_components(num: int, datasets: List[Dict[str, str]], dataset:
     return html.Div([
                 "Dataset:",
                 dcc.Dropdown(datasets, value=dataset,
-                                id=f"dataset_dropdown_{num}"),
+                                id=f"dataset_dropdown_{num}", clearable=False),
                 "Model:",
-                dcc.Dropdown(models, value=model, id=f"model_dropdown_{num}"),
+                dcc.Dropdown(models, value=model, id=f"model_dropdown_{num}", clearable=False),
                 "Descriptive Stat:",
-                dcc.Dropdown(desc_stats, value="mean", id=f"desc_stats_{num}"),
+                dcc.Dropdown(desc_stats, value="mean", id=f"desc_stats_{num}", clearable=False),
                 "Num Tokens:",
                 dcc.Input(type="text", id=f"num_token_{num}"),
                 html.Br(),
@@ -47,7 +47,7 @@ def graph_settings_components(num: int, datasets: List[Dict[str, str]], dataset:
                 dcc.Input(type="text", id=f"input_seq_{num}"),
                 html.Br(),
                 "Graph type:",
-                dcc.Dropdown(graph_types, value=graph_types[0], id=f"graph_type_{num}")
+                dcc.Dropdown(graph_types, value=graph_types[0]["value"], id=f"graph_type_{num}", clearable=False)
                 ], className="graphSettingsFill")
 
 

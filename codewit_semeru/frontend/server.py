@@ -52,7 +52,7 @@ class CodeWITServer():
                 html.Div([
                     html.Div([
                         "View:",
-                        dcc.Dropdown(["single graph", "two graph comparison"], value="two graph comparison", id="view_dropdown")]),
+                        dcc.Dropdown(["single graph", "two graph comparison"], value="two graph comparison", id="view_dropdown", clearable=False)]),
                         html.Div([
                             graph_settings_components(
                                 1, self.FLAT_DUMMY, " ".join(self.dataset_1), models, self.model_1),
