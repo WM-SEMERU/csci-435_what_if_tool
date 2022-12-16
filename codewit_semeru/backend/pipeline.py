@@ -1,4 +1,5 @@
 import sys
+import io
 import os
 import json
 import requests
@@ -8,6 +9,7 @@ from dotenv import load_dotenv
 from typing import List
 from transformers import AutoTokenizer
 import torch
+import tokenize
 
 path = f"{sys.path[0]}/codewit_semeru/backend/config/.env"
 load_dotenv(path)
@@ -40,6 +42,7 @@ class Pipeline:
         self.output_tok_freqs = defaultdict(list)
 
         self.completed: bool = False
+        self.error_dict = {"TokenError": [], "IndentationError": []}
 
     def query_model(self):
         print("Querying HF API, this will take a moment...")
@@ -62,6 +65,14 @@ class Pipeline:
             res = self.query_model()
 
         output_seqs = [data[0]["generated_text"] for data in res]
+        # for item in output_seqs:
+        #     print(f"NEW ITEM == {item}")
+        # Insert python-src-tokenizer here
+        group_tkns = [self.python_src_tokenizer(seq, 0) for seq in output_seqs]
+
+        for item in group_tkns:
+            print(f"NEW ITEM == {item}")
+
         output_tkns = [self.tokenizer.tokenize(seq) for seq in output_seqs]
 
         for tkns in output_tkns:
@@ -76,3 +87,25 @@ class Pipeline:
         
         self.completed = True
         print(f"Pipeline completed for pipe {self.id}")
+
+    # Template for python_src_tokenizer
+    # TODO change return type to just token group and follow same process as other types
+    def python_src_tokenizer(self, s: str, id: int) -> List[tokenize.TokenInfo]:
+        fp = io.StringIO(s)
+        filter_types = [tokenize.ENCODING, tokenize.ENDMARKER, tokenize.ERRORTOKEN]
+        tokens = []
+        token_gen = tokenize.generate_tokens(fp.readline)
+        while True:
+            try:
+                token = next(token_gen)
+                if token.string and token.type not in filter_types:
+                    tokens.append(token)
+            except tokenize.TokenError:
+                self.error_dict["TokenError"].append(id)
+                break
+            except StopIteration:
+                break
+            except IndentationError:
+                self.error_dict["IndentationError"].append(id)
+                continue
+        return tokens
