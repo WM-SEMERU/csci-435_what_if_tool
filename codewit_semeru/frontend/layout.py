@@ -31,7 +31,7 @@ data_editor_components = [
     html.Div(["Predictions:", html.Br(), "[Insert table here]"], className="dataOutput")]
 
 
-def graph_settings_components(num: int, datasets: List[Dict[str, str]], dataset: str, models: List[str], model: str):
+def graph_settings_components(num: int, datasets: List[Dict[str, str]], dataset: str, models: List[Dict[str, str]], model: str):
     return html.Div([
                 "Dataset:",
                 dcc.Dropdown(datasets, value=dataset,
