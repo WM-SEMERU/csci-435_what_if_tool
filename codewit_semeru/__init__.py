@@ -12,7 +12,11 @@ __credits__ = "College of William & Mary"
 from typing import List
 from .frontend.server import CodeWITServer
 
+import os
 
-def WITCode(model: str = "gpt2", dataset: List[str] = [], dataset_id: str = "") -> None:
+
+def WITCode(model: str = "gpt2", dataset: List[str] = [], dataset_id: str = "", token: str = "") -> None:
+    if token != "":
+        os.environ["HF_API_TOKEN"] = token
     server = CodeWITServer(model, dataset, dataset_id)
     server.run()
