@@ -1,4 +1,5 @@
 import sys
+import io
 import os
 import json
 import requests
@@ -8,6 +9,7 @@ from dotenv import load_dotenv
 from typing import List
 from transformers import AutoTokenizer
 import torch
+import tokenize
 
 path = f"{sys.path[0]}/codewit_semeru/backend/config/.env"
 load_dotenv(path)
@@ -38,8 +40,12 @@ class Pipeline:
         self.api_url = f"https://api-inference.huggingface.co/models/{self.model}"
 
         self.output_tok_freqs = defaultdict(list)
+        self.output_group_freqs = defaultdict(list)
 
         self.completed: bool = False
+        self.error_dict = {"TokenError": [], "IndentationError": []}
+
+
 
     def query_model(self):
         print("Querying HF API, this will take a moment...")
@@ -62,6 +68,31 @@ class Pipeline:
             res = self.query_model()
 
         output_seqs = [data[0]["generated_text"] for data in res]
+        # for item in output_seqs:
+        #     print(f"NEW ITEM == {item}")
+        # Insert python-src-tokenizer here
+        python_src_tuples = [self.python_src_tokenizer(seq, 0) for seq in output_seqs]
+
+        group_tkns = []
+
+        for item in python_src_tuples:
+            temp = []
+            for tuple in item:
+                temp.append(tokenize.tok_name[tuple.exact_type])
+            group_tkns.append(temp)
+
+        # Counter for group types, extended zeroes
+        for tkns in group_tkns:
+            cts = Counter(tkns)
+            for tkn in cts:
+                self.output_group_freqs[tkn].append(cts[tkn])
+
+        # extend zeroes similar to output_tok_freqs
+        for tkn in self.output_group_freqs:
+            seq_diff = len(group_tkns) - len(self.output_group_freqs[tkn])
+            self.output_group_freqs[tkn].extend([0] * seq_diff)
+
+        # Start ind tokens here
         output_tkns = [self.tokenizer.tokenize(seq) for seq in output_seqs]
 
         for tkns in output_tkns:
@@ -76,3 +107,25 @@ class Pipeline:
         
         self.completed = True
         print(f"Pipeline completed for pipe {self.id}")
+
+    # Template for python_src_tokenizer
+    # TODO change return type to just token group and follow same process as other types
+    def python_src_tokenizer(self, s: str, id: int) -> List[tokenize.TokenInfo]:
+        fp = io.StringIO(s)
+        filter_types = [tokenize.ENCODING, tokenize.ENDMARKER, tokenize.ERRORTOKEN]
+        tokens = []
+        token_gen = tokenize.generate_tokens(fp.readline)
+        while True:
+            try:
+                token = next(token_gen)
+                if token.string and token.type not in filter_types:
+                    tokens.append(token)
+            except tokenize.TokenError:
+                self.error_dict["TokenError"].append(id)
+                break
+            except StopIteration:
+                break
+            except IndentationError:
+                self.error_dict["IndentationError"].append(id)
+                continue
+        return tokens
