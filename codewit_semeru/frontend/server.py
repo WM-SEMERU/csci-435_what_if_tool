@@ -86,6 +86,9 @@ class CodeWITServer():
 
         if selected_graph == "basic_token_hist":
             return px.bar(df, x="frequency", y="token", labels={"frequency": str(selected_stat) + " token frequency"})
+        
+        elif selected_graph == "token_type_graph":
+            return px.bar(df, x="frequency", y="token_type", labels={"frequency": str(selected_stat) + " token type frequency"})
 
         elif selected_graph == "token_dist_graph":
             frequencies = df['frequency'].tolist()

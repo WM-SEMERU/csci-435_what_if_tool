@@ -40,9 +40,12 @@ class Pipeline:
         self.api_url = f"https://api-inference.huggingface.co/models/{self.model}"
 
         self.output_tok_freqs = defaultdict(list)
+        self.output_group_freqs = defaultdict(list)
 
         self.completed: bool = False
         self.error_dict = {"TokenError": [], "IndentationError": []}
+
+
 
     def query_model(self):
         print("Querying HF API, this will take a moment...")
@@ -68,11 +71,28 @@ class Pipeline:
         # for item in output_seqs:
         #     print(f"NEW ITEM == {item}")
         # Insert python-src-tokenizer here
-        group_tkns = [self.python_src_tokenizer(seq, 0) for seq in output_seqs]
+        python_src_tuples = [self.python_src_tokenizer(seq, 0) for seq in output_seqs]
 
-        for item in group_tkns:
-            print(f"NEW ITEM == {item}")
+        group_tkns = []
 
+        for item in python_src_tuples:
+            temp = []
+            for tuple in item:
+                temp.append(tokenize.tok_name[tuple.exact_type])
+            group_tkns.append(temp)
+
+        # Counter for group types, extended zeroes
+        for tkns in group_tkns:
+            cts = Counter(tkns)
+            for tkn in cts:
+                self.output_group_freqs[tkn].append(cts[tkn])
+
+        # extend zeroes similar to output_tok_freqs
+        for tkn in self.output_group_freqs:
+            seq_diff = len(group_tkns) - len(self.output_group_freqs[tkn])
+            self.output_group_freqs[tkn].extend([0] * seq_diff)
+
+        # Start ind tokens here
         output_tkns = [self.tokenizer.tokenize(seq) for seq in output_seqs]
 
         for tkns in output_tkns:
