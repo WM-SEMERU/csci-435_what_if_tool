@@ -15,8 +15,6 @@ from .frontend.server import CodeWITServer
 import os
 
 
-def WITCode(model: str = "gpt2", dataset: List[str] = [], dataset_id: str = "", token: str = "") -> None:
-    if token != "":
-        os.environ["HF_API_TOKEN"] = token
+def WITCode(model: str = "gpt2", dataset: List[str] = [], dataset_id: str = "") -> None:
     server = CodeWITServer(model, dataset, dataset_id)
     server.run()
