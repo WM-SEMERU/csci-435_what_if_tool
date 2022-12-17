@@ -56,7 +56,7 @@ def test_get_non_existing_pipeline():
 
 def test_run_existing_pipelines():
     store = PipelineStore()
-    pipe = Pipeline("gpt2", "Hello World", "test")
+    pipe = Pipeline("gpt2", ["Hello World", "this is a list", "Duke Ignat Eli Langston Young"], "test")
 
     store.add_pipeline(pipe)
     store.run_pipelines()
@@ -72,7 +72,7 @@ def test_run_pipelines_when_empty():
 
 def test_run_existing_pipe():
     store = PipelineStore()
-    pipe = Pipeline("gpt2", "Hello World", "test")
+    pipe = Pipeline("gpt2", ["Hello World", "this is a list", "Duke Ignat Eli Langston Young"], "test")
 
     store.add_pipeline(pipe)
     store.run_pipe("gpt2<>test")
