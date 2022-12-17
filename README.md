@@ -55,6 +55,8 @@ First prototype is currently available on PyPi. User will need to generate their
 %autoreload 2
 ```
 ```
+%pip install datasets
+
 from datasets.load import load_dataset
 import pandas as pd
 
@@ -73,7 +75,12 @@ for i, input_seq in enumerate(dataset):
 pd.DataFrame(pruned_dataset).describe()
 ```
 ```
-WITCode("codeparrot/codeparrot-small", pruned_dataset, "{api_key_goes_here}")
+import os
+
+os.environ["HF_API_TOKEN"] = "{Insert token here}"
+
+from codewit_semeru import WITCode
+WITCode("codeparrot/codeparrot-small", pruned_dataset)
 ```
 These lines can be run directly from your notebook. Python 3.8 is required. First chunk installs pip module, load auto-reload function. Second chunk loads up the CodeXGlue Code Completion dataset to be utilized with our tool. The last block is the actual implementaion in notebook to run our tool. User needs to supply their own api token to query HF models.
 
