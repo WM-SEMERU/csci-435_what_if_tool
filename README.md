@@ -1,4 +1,7 @@
 # What-If-Code-Tool
+## Visualization Tool for Code Generation Model Analysis
+
+![demo-gif](Artifacts/codewit_demo.gif)
 ## Main Idea
 [Google WIT](https://github.com/PAIR-code/what-if-tool) was the main inspiration for this project. Our goal is to create a similar tool purely for focusing on ML models revolving around software engineering design and principles, such as code completion and code generation. 
 
@@ -21,7 +24,7 @@
 - [x] Implement back-end to spit out some output to dynamic html
 - [ ] Create new views, probability distribution
 - [x] Allow for some interactive aspect with the charts -->
-- [ ] Code concept groupings view: categorize each of the tokens generated in output based on what type they are in code language (declaration, assignment, functions, etc.)
+- [x] Code concept groupings view: categorize each of the tokens generated in output based on what type they are in code language (declaration, assignment, functions, etc.)
 - [x] Display some statistics about the generated output with specific model (median, max, min, etc.)
 - [x] Dynamics re-execution of pipeline when:
   - [ ] User edits # of tokens
