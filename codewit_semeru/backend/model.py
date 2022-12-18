@@ -64,6 +64,19 @@ def preprocess(model: str, dataset: List[str], dataset_id: str, stat: str, graph
             print("Supported statistics are mean, median, std dev, mode, max, and min. Please use one of them.")
         
         return token_freq
+    
+    elif graph == "type_dist_graph":
+        output_group_freqs = pipe.output_group_freqs
+        group_freq = pd.DataFrame(columns=["token_type", "frequency", "output_sequence"])
+
+        for tkn, freqs in output_group_freqs.items():
+            for i, freq in enumerate(freqs):
+                row = pd.Series({"token_type": tkn, "frequency": freq, "output_sequence": i+1})
+                group_freq = pd.concat([group_freq, row.to_frame().T], ignore_index=True)
+
+        group_freq = group_freq.sort_values(by="frequency", ascending=False)
+
+        return group_freq
 
     else:
         output_tkn_freqs = pipe.output_tok_freqs

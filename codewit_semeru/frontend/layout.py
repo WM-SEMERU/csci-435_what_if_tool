@@ -7,7 +7,8 @@ desc_stats = ["mean", "median", "std dev", "mode", "max", "min"]
 
 graph_types = [{"label": "Basic Token Histogram", "value": "basic_token_hist"}, 
                {"label": "Token Distribution Graph", "value": "token_dist_graph"}, 
-               {"label": "Token Type Graph", "value": "token_type_graph"}]
+               {"label": "Token Type Graph", "value": "token_type_graph"},
+               {"label": "Type Distrubtion Graph", "value": "type_dist_graph"},]
 
 data_editor_components = [
     html.P(
