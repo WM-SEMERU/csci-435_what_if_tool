@@ -14,9 +14,11 @@ class PipelineStore(object):
     def add_pipeline(self, pipe: Pipeline) -> None:
         self.pipelines[pipe.id] = pipe
 
-    def remove_pipeline(self, id: int) -> None:
+    def remove_pipeline(self, id: str) -> None:
         if not self.size():
             raise Exception("remove: empty store")
+        if id not in self.pipelines:
+            raise Exception("remove: invalid id")
         del self.pipelines[id]
 
     def get_pipeline(self, id: str) -> Union[Pipeline, None]:
