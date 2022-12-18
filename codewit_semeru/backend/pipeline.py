@@ -51,7 +51,6 @@ class Pipeline:
             "POST", self.api_url, headers=headers, data=data)
         return json.loads(response.content.decode("utf-8"))
 
-    # TODO: Update so output doesn't contain input sequence!
 
     def run(self) -> None:
         res = self.query_model()
@@ -127,8 +126,8 @@ class Pipeline:
 
 
     def parse_code_concepts(self):
-        print(self.dataset[1] + self.output_seqs[1])
-        tree = ast.parse(self.convert_to_python_code(self.dataset[1] + self.output_seqs[1]))
+        print(self.output_seqs[1])
+        tree = ast.parse(self.convert_to_python_code(self.output_seqs[1]))
 
         # Initialize counters for each type of node or expression
         function_body_types = {

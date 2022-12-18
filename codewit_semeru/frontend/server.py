@@ -73,7 +73,6 @@ class CodeWITServer():
         return fig
 
     def run(self) -> None:
-        # TODO: update so bar chart doesn't include input sequence in analyzed tokens! Only predicted tokens.
         # TODO: update so string representations of tokens are shown rather than tokens themselves
         @self.app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown_1", "value"), Input("desc_stats_1", "value"))
         def update_bar_graph1(selected_dataset: List[str] = self.dataset_1, selected_model: str = self.model_1, selected_stat: str = "mean"):
