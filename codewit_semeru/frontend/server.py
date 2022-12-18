@@ -88,9 +88,8 @@ class CodeWITServer():
             return px.bar(df, x="frequency", y="token", labels={"frequency": str(selected_stat) + " token frequency"})
 
         elif selected_graph == "token_dist_graph":
-            frequencies = df['frequency'].tolist()
-            print(frequencies)
-            return px.histogram(df, x=frequencies, color="output_sequence", marginal="violin", hover_data=df.columns, nbins=20,
+            frequencies = df["frequency"].tolist()
+            return px.histogram(df, x=frequencies, color="token", marginal="violin", hover_data=df.columns, nbins=20,
                                 title="token frequencies in output sequences", labels={"x": "frequency ranges"},
                                 histfunc="count", barmode="overlay", log_y=True, opacity=0.5)
 
