@@ -95,16 +95,23 @@ class Pipeline:
         # Start ind tokens here
         output_tkns = [self.tokenizer.tokenize(seq) for seq in output_seqs]
 
+        for i in range(len(output_tkns)):
+            for j in range(len(output_tkns[i])):
+                output_tkns[i][j] = self.tokenizer.convert_tokens_to_ids(output_tkns[i][j])
+                output_tkns[i][j] = self.tokenizer.decode(output_tkns[i][j])
+
         for tkns in output_tkns:
             cts = Counter(tkns)
             for tkn in cts:
                 self.output_tok_freqs[tkn].append(cts[tkn])
-
+        
         # add 0 freq counts for tokens which were not within all predicted sequences
         for tkn in self.output_tok_freqs:
             seq_diff = len(output_tkns) - len(self.output_tok_freqs[tkn])
             self.output_tok_freqs[tkn].extend([0] * seq_diff)                
         
+        # print(f"predicted strings:")
+        # print(*output_seqs, sep="\n---------------------------------\n")
         self.completed = True
         print(f"Pipeline completed for pipe {self.id}")
 
