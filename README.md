@@ -1,4 +1,7 @@
 # What-If-Code-Tool
+## Visualization Tool for Code Generation Model Analysis
+
+![demo-gif](Artifacts/codewit_demo.gif)
 ## Main Idea
 [Google WIT](https://github.com/PAIR-code/what-if-tool) was the main inspiration for this project. Our goal is to create a similar tool purely for focusing on ML models revolving around software engineering design and principles, such as code completion and code generation. 
 
@@ -18,16 +21,16 @@
 
 ## Development Plans
 <!-- - [ ] Interview ML researchers (SEMERU) for what specific views would be useful for their exploration
-- [ ] Implement back-end to spit out some output to dynamic html
+- [x] Implement back-end to spit out some output to dynamic html
 - [ ] Create new views, probability distribution
-- [ ] Allow for some interactive aspect with the charts -->
-- [ ] Code concept groupings view: categorize each of the tokens generated in output based on what type they are in code language (declaration, assignment, functions, etc.)
-- [ ] Display some statistics about the generated output with specific model (median, max, min, etc.)
-- [ ] Dynamics re-execution of pipeline when:
+- [x] Allow for some interactive aspect with the charts -->
+- [x] Code concept groupings view: categorize each of the tokens generated in output based on what type they are in code language (declaration, assignment, functions, etc.)
+- [x] Display some statistics about the generated output with specific model (median, max, min, etc.)
+- [x] Dynamics re-execution of pipeline when:
   - [ ] User edits # of tokens
   - [ ] User edits # of input sequences
-  - [ ] User changes model
-  - [ ] User selects new descriptive statistic
+  - [x] User changes model
+  - [x] User selects new descriptive statistic
 - [ ] Implement bertviz attention models inside app with Dash if possible
 
 ## Current Diagrams
@@ -37,16 +40,42 @@
 ### Sequence Diagram
 ![Sequence Diagram](Artifacts/sequence-diagram-updated.png)
 
+## Supported Features
+- [ ] 4 different views to visually classify code generation models (ind. token, token distrubtion, python token types, token type distribtuion)
+- [ ] 4 pre-trained models for code generation from Hugging Face (GPT2, CodeGen, CodeParrot, GPT-Neo)
+- [ ] Descriptive stats for datasets with many input sequences
+- [ ] Dynamic re-execution on user inputs
+
 ## Installation
-First prototype is currently available on PyPi. It does not do much (yet), but you can initialize an interactive bar graph of token counts in your notebook.
+First prototype is currently available on PyPi. User will need to generate their own Hugging Face API token. 
 
 ```
-!pip install codewit-semeru
-
-from wit_code import wit_code
-wit_code.WITCode("gpt2", "This is a chunk of code", "gpt2")
+%pip install codewit-semeru
+%load_ext autoreload
+%autoreload 2
 ```
-These lines can be run directly from your notebook. Python 3.8 is required.
+```
+from datasets.load import load_dataset
+import pandas as pd
+
+DATA_LEN = 1024
+NUM_DATA = 20
+
+dataset = load_dataset("code_x_glue_cc_code_completion_line", "python", split="train")
+
+pruned_dataset = []
+for i, input_seq in enumerate(dataset):
+    temp = input_seq["input"]  # type: ignore
+    if len(temp) <= DATA_LEN:
+        pruned_dataset.append(temp)
+    if len(pruned_dataset) >= NUM_DATA:
+        break
+pd.DataFrame(pruned_dataset).describe()
+```
+```
+WITCode("codeparrot/codeparrot-small", pruned_dataset, "{api_key_goes_here}")
+```
+These lines can be run directly from your notebook. Python 3.8 is required. First chunk installs pip module, load auto-reload function. Second chunk loads up the CodeXGlue Code Completion dataset to be utilized with our tool. The last block is the actual implementaion in notebook to run our tool. User needs to supply their own api token to query HF models.
 
 ### Build and Run Docker Image
 Start docker

@@ -1,9 +1,15 @@
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+[tool.hatch.build]
+artifacts = [
+  "Artifacts/codewit_demo.gif",
+  "Artifacts/component-diagram-updated.png",
+  "Artifacts/sequence-diagram-updated.png"
+]
 [project]
 name = "codewit_semeru"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
   { name="Ignat Miagkov", email="iamiagkov@wm.edu" },
   { name="Duke Tran", email="dtran@wm.edu" }
@@ -16,7 +22,7 @@ dependencies = [
   'transformers',
   'pandas',
   'torch',
-  'typing',
+  'python-dotenv',
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

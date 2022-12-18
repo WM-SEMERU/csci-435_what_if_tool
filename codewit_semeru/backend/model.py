@@ -1,68 +1,92 @@
-from copy import copy
 from typing import List
 import pandas as pd
 import statistics
 from .pipeline import Pipeline
 from .pipeline_store import PipelineStore
-from bertviz import head_view
+
 
 pipes = PipelineStore()
 
 
-""" def run_pipeline(tokenizer: str, model: str, dataset: str) -> None:
-    print("Pipeline initiated")
-    pipes.add_pipeline(Pipeline(model, dataset))
-    print('Running...')
-    pipes.run_pipelines() """
-
-
-def preprocess(tokenizer: str, model: str, dataset: str, dataset_id: str, stat: str = "mean") -> List[str]:
-    
-    # print("model: ", model)
-    # print("dataset: ", dataset)
-    # print("dataset_id: ", dataset_id)
-    pipe_id = Pipeline.pipe_id(tokenizer, model, dataset_id)
-    pipe = pipes.get_pipeline(pipe_id)
-
-    print("pipeid: ", pipe_id)
-
-    if not pipe:
-        pipe = Pipeline(tokenizer, model, dataset, dataset_id)
-        pipes.add_pipeline(pipe)
-        pipes.run_pipe(pipe_id)
-
+def stats_func(stat: str):
     if stat == "mean":
-        stats_func = statistics.mean
+        return statistics.mean
     elif stat == "median":
-        stats_func = statistics.median
+        return statistics.median
     elif stat == "std dev":
-        stats_func = statistics.stdev
+        return statistics.stdev
     elif stat == "max":
-        stats_func = max
+        return max
     elif stat == "min":
-        stats_func = min
+        return min
     elif stat == "mode":
-        stats_func = statistics.mode
+        return statistics.mode
     else:
-        raise ValueError("Supported statistics are mean, median, std dev, mode, max, and min. Please use one of them.")
+        raise ValueError
 
-    # output_tkns = pipe.output_tkns
-    # print("pipe.output_tok_freqs: ", pipe.output_tok_freqs)
-    output_tkn_freqs = copy(pipe.output_tok_freqs)
-    for tkn in output_tkn_freqs:
-        output_tkn_freqs[tkn] = stats_func(output_tkn_freqs[tkn])
 
-    token_freq = pd.DataFrame(
-        output_tkn_freqs.items(), columns=["token", "frequency"]
-    ).sort_values(by="frequency", ascending=False)
-    print(f"token_freq for {stat}:\n{token_freq}")
+def preprocess(model: str, dataset: List[str], dataset_id: str, stat: str, graph: str) -> pd.DataFrame:
+    pipe = pipes.get_pipeline(Pipeline.pipe_id(model, dataset_id))
+    if not pipe:
+        pipe = Pipeline(model, dataset, dataset_id)
+        pipes.add_pipeline(pipe)
+        pipes.run_pipe(pipe.id)
 
-    return token_freq.head(20)
+    if graph == "basic_token_hist":
+        token_freq = pd.DataFrame()
 
-    #["median", "mean", "max", "min", "std dev"]
+        try:
+            stat_func = stats_func(stat)
+            output_tkn_freqs = {tkn: stat_func(freqs) for tkn, freqs in pipe.output_tok_freqs.items()}
 
-def get_bertviz():
-    #Temporarily coded so that bertviz analyzes only the FIRST input sequence from the "dataset" WITCode() list parameter 
-    attention, input_tkns = pipes.get_pipeline(
-        0).attention[0], pipes.get_pipeline(0).input_tkns[0]
-    return head_view(attention, input_tkns)
+            token_freq = pd.DataFrame.from_dict(output_tkn_freqs, orient="index", columns=[
+                                                "frequency"]).rename_axis("token").reset_index()
+            token_freq = token_freq.sort_values(by="frequency", ascending=False)
+
+        except ValueError:
+            print("Supported statistics are mean, median, std dev, mode, max, and min. Please use one of them.")
+
+        return token_freq.head(20)
+    
+    elif graph == "token_type_graph":
+        token_freq = pd.DataFrame()
+
+        try:
+            stat_func = stats_func(stat)
+            output_group_freqs = {tkn: stat_func(freqs) for tkn, freqs in pipe.output_group_freqs.items()}
+
+            token_freq = pd.DataFrame.from_dict(output_group_freqs, orient="index", columns=[
+                                                "frequency"]).rename_axis("token_type").reset_index()
+         
+            token_freq = token_freq.sort_values(by="frequency", ascending=False)
+
+        except ValueError:
+            print("Supported statistics are mean, median, std dev, mode, max, and min. Please use one of them.")
+        
+        return token_freq
+    
+    elif graph == "type_dist_graph":
+        output_group_freqs = pipe.output_group_freqs
+        group_freq = pd.DataFrame(columns=["token_type", "frequency", "output_sequence"])
+
+        for tkn, freqs in output_group_freqs.items():
+            for i, freq in enumerate(freqs):
+                row = pd.Series({"token_type": tkn, "frequency": freq, "output_sequence": i+1})
+                group_freq = pd.concat([group_freq, row.to_frame().T], ignore_index=True)
+
+        group_freq = group_freq.sort_values(by="frequency", ascending=False)
+
+        return group_freq
+
+    else:
+        output_tkn_freqs = pipe.output_tok_freqs
+        token_freq = pd.DataFrame(columns=["token", "frequency", "output_sequence"])
+
+        for tkn, freqs in output_tkn_freqs.items():
+            for i, freq in enumerate(freqs):
+                row = pd.Series({"token": tkn, "frequency": freq, "output_sequence": i+1})
+                token_freq = pd.concat([token_freq, row.to_frame().T], ignore_index=True)
+
+        token_freq = token_freq.sort_values(by="frequency", ascending=False)
+
+        return token_freq
