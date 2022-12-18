@@ -24,6 +24,30 @@ def stats_func(stat: str):
     else:
         raise ValueError
 
+def calculate_complexity(code):
+    #lenght of code sample
+    words = len(code.split())
+    #count and weight number of loops and conditionals
+    complexity = 3*code.count('for') + 2*code.count('while') + 2*code.count('if')
+    #return complexity score
+    return ((words * complexity) + words)
+
+# takes in a dataset of code snippets, sorts code by complexity into 3 lists (short, moderate, complex)
+# returns tuple contining the 3 lists
+def classify_code(dataset: List[str]):
+    simple = []     #complexity < 100, ie: short, few conditionals or loops
+    moderate = []   #100 < complexity < 500 ie: moderate length, may have conditionals or loops
+    complex = []    #complexity >500
+
+    for code in dataset:
+        complexity = calculate_complexity(code)
+        if complexity < 100:
+            simple.append(code)
+        elif complexity > 500:
+            complex.append(code)
+        else:
+            moderate.append(code)
+    return (simple, moderate, complex)
 
 def preprocess(model: str, dataset: List[str], dataset_id: str, stat: str, graph: str) -> pd.DataFrame:
     pipe = pipes.get_pipeline(Pipeline.pipe_id(model, dataset_id))
