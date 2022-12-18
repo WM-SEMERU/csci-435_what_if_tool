@@ -7,6 +7,7 @@ from .pipeline_store import PipelineStore
 
 pipes = PipelineStore()
 
+
 def stats_func(stat: str):
     if stat == "mean":
         return statistics.mean
@@ -22,6 +23,7 @@ def stats_func(stat: str):
         return statistics.mode
     else:
         raise ValueError
+
 
 def preprocess(model: str, dataset: List[str], dataset_id: str, stat: str, graph: str) -> pd.DataFrame:
     pipe = pipes.get_pipeline(Pipeline.pipe_id(model, dataset_id))
@@ -43,7 +45,7 @@ def preprocess(model: str, dataset: List[str], dataset_id: str, stat: str, graph
 
         except ValueError:
             print("Supported statistics are mean, median, std dev, mode, max, and min. Please use one of them.")
-        
+
         return token_freq.head(20)
     
     elif graph == "token_type_graph":
@@ -65,16 +67,13 @@ def preprocess(model: str, dataset: List[str], dataset_id: str, stat: str, graph
 
     else:
         output_tkn_freqs = pipe.output_tok_freqs
-        # Create an empty dataframe with three columns
         token_freq = pd.DataFrame(columns=["token", "frequency", "output_sequence"])
 
-        # Iterate over the dictionary
         for tkn, freqs in output_tkn_freqs.items():
-            # Create a series of rows for each output sequence
             for i, freq in enumerate(freqs):
                 row = pd.Series({"token": tkn, "frequency": freq, "output_sequence": i+1})
                 token_freq = pd.concat([token_freq, row.to_frame().T], ignore_index=True)
 
-        print(token_freq)
-        return token_freq
+        token_freq = token_freq.sort_values(by="frequency", ascending=False)
 
+        return token_freq

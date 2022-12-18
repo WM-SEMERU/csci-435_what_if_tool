@@ -21,7 +21,7 @@ headers = {"Authorization": f"Bearer {HF_API_KEY}"}
 
 
 class Pipeline:
-    # to-do https://github.com/tensorflow/tensorflow/issues/53529
+    # TODO https://github.com/tensorflow/tensorflow/issues/53529
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
     @staticmethod
@@ -49,11 +49,11 @@ class Pipeline:
 
     def query_model(self):
         print("Querying HF API, this will take a moment...")
-        data = json.dumps({"inputs": self.dataset, "parameters": {"return_full_text": False, "max_new_tokens": 50, "max_time": 30}})
+        data = json.dumps({"inputs": self.dataset, "parameters": {
+                          "return_full_text": False, "max_new_tokens": 50, "max_time": 30}})
         response = requests.request(
             "POST", self.api_url, headers=headers, data=data)
         return json.loads(response.content.decode("utf-8"))
-
 
     def run(self) -> None:
         res = self.query_model()
@@ -61,7 +61,7 @@ class Pipeline:
             print("error: ", res["error"])
             if "estimated_time" not in res:
                 raise RuntimeError("pipeline run")
-            
+
             print("Retrying in ", res["estimated_time"], "seconds")
             time.sleep(res["estimated_time"])
             print("Retrying...")
@@ -108,8 +108,8 @@ class Pipeline:
         # add 0 freq counts for tokens which were not within all predicted sequences
         for tkn in self.output_tok_freqs:
             seq_diff = len(output_tkns) - len(self.output_tok_freqs[tkn])
-            self.output_tok_freqs[tkn].extend([0] * seq_diff)                
-        
+            self.output_tok_freqs[tkn].extend([0] * seq_diff)
+
         # print(f"predicted strings:")
         # print(*output_seqs, sep="\n---------------------------------\n")
         self.completed = True
