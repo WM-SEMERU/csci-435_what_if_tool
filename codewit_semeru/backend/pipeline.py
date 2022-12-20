@@ -11,6 +11,8 @@ from transformers import AutoTokenizer
 import torch
 import tokenize
 
+complexity_to_int = {"simple":0,"moderate":1,"complex":2,"all":3}
+
 path = f"{sys.path[0]}/codewit_semeru/backend/config/.env"
 load_dotenv(path)
 
@@ -28,9 +30,38 @@ class Pipeline:
     def pipe_id(model: str, dataset_id: str) -> str:
         return "<>".join([model, dataset_id])
 
-    def __init__(self, model: str, dataset: List[str], dataset_id: str = "") -> None:
+    def calculate_complexity(code):
+        #lenght of code sample
+        words = len(code.split())
+        #count and weight number of loops and conditionals
+        complexity = 3*code.count('for') + 2*code.count('while') + 2*code.count('if')
+        #return complexity score
+        return ((words * complexity) + words)
+
+    # takes in a dataset of code snippets, sorts code by complexity into 3 lists (short, moderate, complex)
+    # returns tuple contining the 3 lists
+    def classify_code(dataset: List[str]):
+        simple = []     #complexity < 100, ie: short, few conditionals or loops
+        moderate = []   #100 < complexity < 500 ie: moderate length, may have conditionals or loops
+        complex = []    #complexity >500
+
+        for code in dataset:
+            complexity = calculate_complexity(code)
+            if complexity < 100:
+                simple.append(code)
+            elif complexity > 500:
+                complex.append(code)
+            else:
+                moderate.append(code)
+        return (simple, moderate, complex)
+
+    def update_complexity(complexity: str):
+        self.complexity = complexity
+
+    def __init__(self, model: str, dataset: List[str], dataset_id: str = "", complexity:str="all") -> None:
         self.model: str = model
-        self.dataset: List[str] = dataset
+        tempTup = classify_code(dataset)
+        self.dataset: = {"simple":tempTup[0], "moderate":tempTup[1], "complex":tempTup[2], "all":dataset}
         self.dataset_id: str = dataset_id
 
         self.id: str = Pipeline.pipe_id(model, dataset_id)
@@ -49,7 +80,7 @@ class Pipeline:
 
     def query_model(self):
         print("Querying HF API, this will take a moment...")
-        data = json.dumps({"inputs": self.dataset, "parameters": {
+        data = json.dumps({"inputs": self.dataset[self.complexity], "parameters": {
                           "return_full_text": False, "max_new_tokens": 50, "max_time": 30}})
         response = requests.request(
             "POST", self.api_url, headers=headers, data=data)

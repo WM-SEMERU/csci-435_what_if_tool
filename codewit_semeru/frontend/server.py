@@ -66,7 +66,7 @@ class CodeWITServer():
             ], className="graph")
         ])
 
-    def update_data_and_chart(self, selected_model: str, selected_dataset: List[str], selected_stat: str, selected_graph: str) -> Figure:
+    def update_data_and_chart(self, selected_model: str, selected_dataset: List[str], selected_stat: str, selected_graph: str, selected_complexity: str) -> Figure:
         # ? #60 - can this be done another way given dataset dropdown vs. input?
         dataset_id = next((d["label"] for d in self.FLAT_DUMMY if d["value"] == selected_dataset), "")
         selected_dataset_id = dataset_id if dataset_id else ""
@@ -81,7 +81,7 @@ class CodeWITServer():
             f"Processing {Pipeline.pipe_id(selected_model, selected_dataset_id)}\nPlease wait...")
 
         df = preprocess(selected_model, selected_dataset,
-                        selected_dataset_id, selected_stat, selected_graph)
+                        selected_dataset_id, selected_stat, selected_graph, selected_complexity)
         print("Done!")
 
         if selected_graph == "basic_token_hist":
@@ -101,19 +101,19 @@ class CodeWITServer():
 
     def run(self) -> None:
         # TODO: update so string representations of tokens are shown rather than tokens themselves
-        @self.app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown_1", "value"), Input("desc_stats_1", "value"), Input("graph_type_1", "value"))
-        def update_bar_graph1(selected_dataset: List[str] = self.dataset_1, selected_model: str = self.model_1, selected_stat: str = "mean", selected_graph: str = "basic_token_hist"):
+        @self.app.callback(Output("graph1", "figure"), Input("dataset_dropdown_1", "value"), Input("model_dropdown_1", "value"), Input("desc_stats_1", "value"), Input("graph_type_1", "value"), Input("complexities_1", "value"))
+        def update_bar_graph1(selected_dataset: List[str] = self.dataset_1, selected_model: str = self.model_1, selected_stat: str = "mean", selected_graph: str = "basic_token_hist", selected_complexity: str = "all"):
             try:
-                return self.update_data_and_chart(selected_model, selected_dataset, selected_stat, selected_graph)
+                return self.update_data_and_chart(selected_model, selected_dataset, selected_stat, selected_graph, selected_complexity)
             except LookupError:
                 print("error: dataset not found!")
             return px.bar()
 
-        @self.app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"), Input("graph_type_2", "value"))
-        def update_bar_graph2(selected_dataset: List[str] = self.dataset_2, selected_model: str = self.model_2, selected_stat: str = "mean", selected_graph: str = "basic_token_hist"):
+        @self.app.callback(Output("graph2", "figure"), Input("dataset_dropdown_2", "value"), Input("model_dropdown_2", "value"), Input("desc_stats_2", "value"), Input("graph_type_2", "value"), Input("complexities_2", "value"))
+        def update_bar_graph2(selected_dataset: List[str] = self.dataset_2, selected_model: str = self.model_2, selected_stat: str = "mean", selected_graph: str = "basic_token_hist", selected_complexity: str = "all"):
             if selected_dataset and selected_model:
                 try:
-                    return self.update_data_and_chart(selected_model, selected_dataset, selected_stat, selected_graph)
+                    return self.update_data_and_chart(selected_model, selected_dataset, selected_stat, selected_graph, selected_complexity)
                 except LookupError:
                     traceback.print_exc()
                     print("error: dataset not found!")
