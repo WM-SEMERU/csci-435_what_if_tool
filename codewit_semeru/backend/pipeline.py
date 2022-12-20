@@ -61,7 +61,7 @@ class Pipeline:
     def __init__(self, model: str, dataset: List[str], dataset_id: str = "", complexity:str="all") -> None:
         self.model: str = model
         tempTup = classify_code(dataset)
-        self.dataset: = {"simple":tempTup[0], "moderate":tempTup[1], "complex":tempTup[2], "all":dataset}
+        self.dataset = {"simple":tempTup[0], "moderate":tempTup[1], "complex":tempTup[2], "all":dataset}
         self.dataset_id: str = dataset_id
 
         self.id: str = Pipeline.pipe_id(model, dataset_id)
