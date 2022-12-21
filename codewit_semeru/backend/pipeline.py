@@ -30,7 +30,7 @@ class Pipeline:
     def pipe_id(model: str, dataset_id: str) -> str:
         return "<>".join([model, dataset_id])
 
-    def calculate_complexity(code):
+    def calculate_complexity(self, code):
         #lenght of code sample
         words = len(code.split())
         #count and weight number of loops and conditionals
@@ -40,13 +40,13 @@ class Pipeline:
 
     # takes in a dataset of code snippets, sorts code by complexity into 3 lists (short, moderate, complex)
     # returns tuple contining the 3 lists
-    def classify_code(dataset: List[str]):
+    def classify_code(self, dataset: List[str]):
         simple = []     #complexity < 100, ie: short, few conditionals or loops
         moderate = []   #100 < complexity < 500 ie: moderate length, may have conditionals or loops
         complex = []    #complexity >500
 
         for code in dataset:
-            complexity = calculate_complexity(code)
+            complexity = self.calculate_complexity(code)
             if complexity < 100:
                 simple.append(code)
             elif complexity > 500:
@@ -55,16 +55,16 @@ class Pipeline:
                 moderate.append(code)
         return (simple, moderate, complex)
 
-    def update_complexity(complexity: str):
+    def update_complexity(self, complexity: str):
         self.complexity = complexity
 
     def __init__(self, model: str, dataset: List[str], dataset_id: str = "", complexity:str="all") -> None:
         self.model: str = model
-        tempTup = classify_code(dataset)
-        self.dataset = {"simple":tempTup[0], "moderate":tempTup[1], "complex":tempTup[2], "all":dataset}
+        tempTup = self.classify_code(dataset)
+        self.dataset: List[str] = dataset
         self.dataset_id: str = dataset_id
-
-        self.id: str = Pipeline.pipe_id(model, dataset_id)
+        self.complexity: str = complexity
+        self.id: str = self.pipe_id(model, dataset_id)
 
         self.tokenizer = AutoTokenizer.from_pretrained(model)
 
@@ -80,7 +80,7 @@ class Pipeline:
 
     def query_model(self):
         print("Querying HF API, this will take a moment...")
-        data = json.dumps({"inputs": self.dataset[self.complexity], "parameters": {
+        data = json.dumps({"inputs": self.dataset, "parameters": {
                           "return_full_text": False, "max_new_tokens": 50, "max_time": 30}})
         response = requests.request(
             "POST", self.api_url, headers=headers, data=data)
@@ -99,6 +99,9 @@ class Pipeline:
             res = self.query_model()
 
         output_seqs = [data[0]["generated_text"] for data in res]
+
+        output_seqs = output_seqs if self.complexity == "all" else self.classify_code(output_seqs)[complexity_to_int[self.complexity]]
+        
         # for item in output_seqs:
         #     print(f"NEW ITEM == {item}")
         # Insert python-src-tokenizer here

@@ -32,7 +32,9 @@ def preprocess(model: str, dataset: List[str], dataset_id: str, stat: str, graph
         pipes.add_pipeline(pipe)
         pipes.run_pipe(pipe.id)
 
-    pipe.update_complexity(complexity);
+    if not pipe.complexity == complexity:
+        pipe.update_complexity(complexity)
+        pipes.run_pipe(pipe.id)
 
     if graph == "basic_token_hist":
         token_freq = pd.DataFrame()
