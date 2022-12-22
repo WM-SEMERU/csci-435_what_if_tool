@@ -49,16 +49,18 @@ class CodeWITServer():
         self.app.layout = html.Div([
             # html.Div(data_editor_components, className="dataEditor"),
             html.Div([
-                html.Div([
-                    html.Div([
-                        "View:",
-                        dcc.Dropdown(["single graph", "two graph comparison"], value="two graph comparison", id="view_dropdown", clearable=False)]),
+#                html.Div([
+
+#                    html.Div([
+#                        "View:",
+#                        dcc.Dropdown(["single graph", "two graph comparison"], value="two graph comparison", id="view_dropdown", clearable=False)]),
+
                     html.Div([
                         graph_settings_components(
                             1, self.FLAT_DUMMY, " ".join(self.dataset_1), models, self.model_1),
                         graph_settings_components(
                             2, self.FLAT_DUMMY, " ".join(self.dataset_2), models, self.model_2)])
-                ], className="graphSettings")
+#                ], className="graphSettings")
             ], className="graphSettings"),
             html.Div([
                 dcc.Graph(id="graph1"),
