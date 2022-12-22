@@ -9,10 +9,11 @@ artifacts = [
 ]
 [project]
 name = "codewit_semeru"
-version = "0.1.3"
+version = "0.1.4"
 authors = [
   { name="Ignat Miagkov", email="iamiagkov@wm.edu" },
-  { name="Duke Tran", email="dtran@wm.edu" }
+  { name="Duke Tran", email="dtran@wm.edu" },
+  { name="Eli Svoboda", email="essvoboda@wm.edu" }
 ]
 description = "Code What-If-Tool"
 readme = "README.md"
