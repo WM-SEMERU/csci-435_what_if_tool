@@ -11,6 +11,8 @@ from transformers import AutoTokenizer
 import torch
 import tokenize
 
+complexity_to_int = {"simple":0,"moderate":1,"complex":2,"all":3}
+
 path = f"{sys.path[0]}/codewit_semeru/backend/config/.env"
 load_dotenv(path)
 
@@ -28,12 +30,41 @@ class Pipeline:
     def pipe_id(model: str, dataset_id: str) -> str:
         return "<>".join([model, dataset_id])
 
-    def __init__(self, model: str, dataset: List[str], dataset_id: str = "") -> None:
+    def calculate_complexity(self, code):
+        #lenght of code sample
+        words = len(code.split())
+        #count and weight number of loops and conditionals
+        complexity = 3*code.count('for') + 2*code.count('while') + 2*code.count('if')
+        #return complexity score
+        return ((words * complexity) + words)
+
+    # takes in a dataset of code snippets, sorts code by complexity into 3 lists (short, moderate, complex)
+    # returns tuple contining the 3 lists
+    def classify_code(self, dataset: List[str]):
+        simple = []     #complexity < 100, ie: short, few conditionals or loops
+        moderate = []   #100 < complexity < 500 ie: moderate length, may have conditionals or loops
+        complex = []    #complexity >500
+
+        for code in dataset:
+            complexity = self.calculate_complexity(code)
+            if complexity < 100:
+                simple.append(code)
+            elif complexity > 500:
+                complex.append(code)
+            else:
+                moderate.append(code)
+        return (simple, moderate, complex)
+
+    def update_complexity(self, complexity: str):
+        self.complexity = complexity
+
+    def __init__(self, model: str, dataset: List[str], dataset_id: str = "", complexity:str="all") -> None:
         self.model: str = model
+        tempTup = self.classify_code(dataset)
         self.dataset: List[str] = dataset
         self.dataset_id: str = dataset_id
-
-        self.id: str = Pipeline.pipe_id(model, dataset_id)
+        self.complexity: str = complexity
+        self.id: str = self.pipe_id(model, dataset_id)
 
         self.tokenizer = AutoTokenizer.from_pretrained(model)
 
@@ -68,6 +99,9 @@ class Pipeline:
             res = self.query_model()
 
         output_seqs = [data[0]["generated_text"] for data in res]
+
+        output_seqs = output_seqs if self.complexity == "all" else self.classify_code(output_seqs)[complexity_to_int[self.complexity]]
+        
         # for item in output_seqs:
         #     print(f"NEW ITEM == {item}")
         # Insert python-src-tokenizer here
