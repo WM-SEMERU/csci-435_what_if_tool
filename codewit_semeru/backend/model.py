@@ -25,11 +25,15 @@ def stats_func(stat: str):
         raise ValueError
 
 
-def preprocess(model: str, dataset: List[str], dataset_id: str, stat: str, graph: str) -> pd.DataFrame:
+def preprocess(model: str, dataset: List[str], dataset_id: str, stat: str, graph: str, complexity:str) -> pd.DataFrame:
     pipe = pipes.get_pipeline(Pipeline.pipe_id(model, dataset_id))
     if not pipe:
-        pipe = Pipeline(model, dataset, dataset_id)
+        pipe = Pipeline(model, dataset, dataset_id, complexity)
         pipes.add_pipeline(pipe)
+        pipes.run_pipe(pipe.id)
+
+    if not pipe.complexity == complexity:
+        pipe.update_complexity(complexity)
         pipes.run_pipe(pipe.id)
 
     if graph == "basic_token_hist":
